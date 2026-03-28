@@ -4,8 +4,11 @@ import * as s from './Home.css'
 import { getAppState } from '@utils/storage'
 import type { AppState, CarProfile } from '@utils/types'
 import { formatCost } from '@utils/calculator'
+import { useI18n, substitute } from '@utils/i18n'
 
 export const Home: Component = () => {
+  const i18n = useI18n()
+
   const stateQuery = createQuery(() => ({
     queryKey: ['appState'] as const,
     queryFn: getAppState,
@@ -18,19 +21,19 @@ export const Home: Component = () => {
 
   const formatEfficiency = (car: CarProfile): { value: string; unit: string } | null => {
     if (car.fuelType === 'electric') {
-      return car.kWh100km ? { value: String(car.kWh100km), unit: 'kWh/100km' } : null
+      return car.kWh100km ? { value: String(car.kWh100km), unit: i18n['kWh/100km'] } : null
     }
     const l100km = car.useRealWorld ? car.realWorldL100km : car.officialL100km
-    return l100km ? { value: String(l100km), unit: 'L/100km' } : null
+    return l100km ? { value: String(l100km), unit: i18n['L/100km'] } : null
   }
 
   const fuelTypeLabel = (car: CarProfile): string => {
     const labels: Record<string, string> = {
-      petrol: 'Petrol',
-      diesel: 'Diesel',
-      hybrid: 'Hybrid',
-      phev: 'PHEV',
-      electric: 'Electric',
+      petrol: i18n['Petrol'],
+      diesel: i18n['Diesel'],
+      hybrid: i18n['Hybrid'],
+      phev: i18n['PHEV'],
+      electric: i18n['Electric'],
     }
     return labels[car.fuelType] ?? car.fuelType
   }
@@ -43,18 +46,18 @@ export const Home: Component = () => {
   }
 
   const formatLastUpdated = (ts: number): string => {
-    if (!ts) return 'Never'
+    if (!ts) return i18n['Never']
     const d = new Date(ts)
     const now = new Date()
     const diffMs = now.getTime() - d.getTime()
     const diffHrs = Math.floor(diffMs / 3600000)
-    if (diffHrs < 1) return 'Just now'
-    if (diffHrs < 24) return `${diffHrs}h ago`
+    if (diffHrs < 1) return i18n['Just now']
+    if (diffHrs < 24) return substitute(i18n['{{hours}}h ago'], { hours: String(diffHrs) })
     return d.toLocaleDateString()
   }
 
   return (
-    <Show when={state()} fallback={<div class={s.container}>Loading...</div>}>
+    <Show when={state()} fallback={<div class={s.container}>{i18n['Loading...']}</div>}>
       {(appState) => (
         <div class={s.container}>
           <Show when={activeCar()}>
@@ -62,7 +65,7 @@ export const Home: Component = () => {
               const eff = () => formatEfficiency(car())
               return (
                 <div class={s.vehicleSection}>
-                  <span class={s.vehicleLabel}>Active Vessel</span>
+                  <span class={s.vehicleLabel}>{i18n['Active Vessel']}</span>
                   <h2 class={s.vehicleName}>{car().nickname}</h2>
 
                   <div class={s.fuelChips}>
@@ -73,8 +76,8 @@ export const Home: Component = () => {
 
                   <div class={s.vehicleStats}>
                     <div class={`${s.statCard} ${s.statCardPrimary}`}>
-                      <span class={s.statLabel}>Avg Consumption</span>
-                      <Show when={eff()} fallback={<span class={s.statValue}>N/A</span>}>
+                      <span class={s.statLabel}>{i18n['Avg Consumption']}</span>
+                      <Show when={eff()} fallback={<span class={s.statValue}>{i18n['N/A']}</span>}>
                         {(e) => (
                           <div>
                             <span class={s.statValue}>{e().value}</span>
@@ -84,10 +87,14 @@ export const Home: Component = () => {
                       </Show>
                     </div>
                     <div class={`${s.statCard} ${s.statCardTertiary}`}>
-                      <span class={s.statLabel}>Engine</span>
+                      <span class={s.statLabel}>{i18n['Engine']}</span>
                       <div>
                         <span class={s.statValue}>
-                          {car().engineSizeL ? `${car().engineSizeL}L` : '--'}
+                          {car().engineSizeL
+                            ? substitute(i18n['{{size}}L'], {
+                                size: String(car().engineSizeL),
+                              })
+                            : i18n['--']}
                         </span>
                       </div>
                     </div>
@@ -99,7 +106,7 @@ export const Home: Component = () => {
 
           <div class={s.pricesSection}>
             <div class={s.pricesHeader}>
-              <h3 class={s.pricesTitle}>Local Fuel Rates</h3>
+              <h3 class={s.pricesTitle}>{i18n['Local Fuel Rates']}</h3>
               <span class={s.pricesLocation}>
                 <span class={`material-symbols-outlined ${s.iconSm}`}>location_on</span>
                 {appState().fuelPrices.source}
@@ -113,8 +120,8 @@ export const Home: Component = () => {
                     <span class="material-symbols-outlined">local_gas_station</span>
                   </div>
                   <div class={s.priceInfo}>
-                    <span class={s.priceName}>Unleaded</span>
-                    <span class={s.priceSubtext}>per litre</span>
+                    <span class={s.priceName}>{i18n['Unleaded']}</span>
+                    <span class={s.priceSubtext}>{i18n['per litre']}</span>
                   </div>
                 </div>
                 <span class={`${s.priceValue} ${s.priceValueVariant.petrol}`}>
@@ -128,8 +135,8 @@ export const Home: Component = () => {
                     <span class="material-symbols-outlined">oil_barrel</span>
                   </div>
                   <div class={s.priceInfo}>
-                    <span class={s.priceName}>Diesel</span>
-                    <span class={s.priceSubtext}>per litre</span>
+                    <span class={s.priceName}>{i18n['Diesel']}</span>
+                    <span class={s.priceSubtext}>{i18n['per litre']}</span>
                   </div>
                 </div>
                 <span class={`${s.priceValue} ${s.priceValueVariant.diesel}`}>
@@ -143,8 +150,8 @@ export const Home: Component = () => {
                     <span class="material-symbols-outlined">bolt</span>
                   </div>
                   <div class={s.priceInfo}>
-                    <span class={s.priceName}>Electric</span>
-                    <span class={s.priceSubtext}>per kWh</span>
+                    <span class={s.priceName}>{i18n['Electric']}</span>
+                    <span class={s.priceSubtext}>{i18n['per kWh']}</span>
                   </div>
                 </div>
                 <span class={`${s.priceValue} ${s.priceValueVariant.electric}`}>
@@ -157,7 +164,9 @@ export const Home: Component = () => {
             </div>
 
             <span class={s.lastUpdated}>
-              Updated {formatLastUpdated(appState().fuelPrices.lastUpdated)}
+              {substitute(i18n['Updated {{time}}'], {
+                time: formatLastUpdated(appState().fuelPrices.lastUpdated),
+              })}
             </span>
           </div>
         </div>

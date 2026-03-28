@@ -3,6 +3,7 @@ import { createQuery } from '@tanstack/solid-query'
 import * as s from './TrimPicker.css'
 import { getTrims } from '@utils/carLookup'
 import type { CarQueryTrim } from '@utils/types'
+import { useI18n } from '@utils/i18n'
 
 interface TrimPickerProps {
   make: string
@@ -13,6 +14,8 @@ interface TrimPickerProps {
 }
 
 export const TrimPicker: Component<TrimPickerProps> = (props) => {
+  const i18n = useI18n()
+
   const trimsQuery = createQuery(() => ({
     queryKey: ['carTrims', props.make, props.model, props.year] as const,
     queryFn: () => getTrims(props.make, props.model, props.year),
@@ -25,7 +28,7 @@ export const TrimPicker: Component<TrimPickerProps> = (props) => {
     const parts: string[] = []
     if (trim.modelEngineCC) parts.push(`${(trim.modelEngineCC / 1000).toFixed(1)}L`)
     if (trim.modelEngineFuel) parts.push(trim.modelEngineFuel)
-    if (trim.modelLkm_mixed) parts.push(`${trim.modelLkm_mixed} L/100km`)
+    if (trim.modelLkm_mixed) parts.push(`${trim.modelLkm_mixed} ${i18n['L/100km']}`)
     if (trim.modelTransmissionType) parts.push(trim.modelTransmissionType)
     return parts.join(' · ')
   }
@@ -33,15 +36,15 @@ export const TrimPicker: Component<TrimPickerProps> = (props) => {
   return (
     <div class={s.container}>
       <button class={s.backLink} onClick={() => props.onBack()}>
-        &larr; Back to search
+        {i18n['← Back to search']}
       </button>
       <div class={s.heading}>
         {props.make} {props.model} {props.year}
       </div>
-      <div class={s.subheading}>Select your trim variant:</div>
+      <div class={s.subheading}>{i18n['Select your trim variant:']}</div>
 
       <Show when={trimsQuery.isLoading}>
-        <span class={s.loading}>Loading trims...</span>
+        <span class={s.loading}>{i18n['Loading trims...']}</span>
       </Show>
 
       <Show when={!trimsQuery.isLoading && trims().length > 0}>
@@ -50,7 +53,7 @@ export const TrimPicker: Component<TrimPickerProps> = (props) => {
             {(trim) => (
               <button class={s.trimItem} onClick={() => props.onSelect(trim)}>
                 <div class={s.trimName}>
-                  {trim.modelTrim || 'Base'}
+                  {trim.modelTrim || i18n['Base']}
                   <Show when={trim.modelYear}>
                     <span class={s.trimYear}> ({trim.modelYear})</span>
                   </Show>
@@ -63,7 +66,7 @@ export const TrimPicker: Component<TrimPickerProps> = (props) => {
       </Show>
 
       <Show when={!trimsQuery.isLoading && trims().length === 0}>
-        <span class={s.loading}>No trims found</span>
+        <span class={s.loading}>{i18n['No trims found']}</span>
       </Show>
     </div>
   )

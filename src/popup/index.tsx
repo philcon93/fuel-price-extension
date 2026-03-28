@@ -1,5 +1,6 @@
 import { render } from 'solid-js/web'
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
+import { I18nProvider } from '@utils/i18n'
 import { App } from './App'
 import { initAnalytics, AnalyticsEvents } from '@utils/analytics'
 
@@ -40,7 +41,9 @@ if (root) {
   render(
     () => (
       <QueryClientProvider client={queryClient}>
-        <App />
+        <I18nProvider>
+          <App />
+        </I18nProvider>
       </QueryClientProvider>
     ),
     root,

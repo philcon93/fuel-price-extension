@@ -7,6 +7,7 @@ import { ManualEntry } from '@components/ManualEntry'
 import { TrimPicker } from '@components/TrimPicker'
 import type { CarProfile, CarQueryTrim } from '@utils/types'
 import { AnalyticsEvents } from '@utils/analytics'
+import { useI18n } from '@utils/i18n'
 
 interface CarSearchProps {
   editCarId?: string
@@ -14,6 +15,7 @@ interface CarSearchProps {
 }
 
 export const CarSearch: Component<CarSearchProps> = (props) => {
+  const i18n = useI18n()
   const queryClient = useQueryClient()
   const [query, setQuery] = createSignal('')
   const [debouncedQuery, setDebouncedQuery] = createSignal('')
@@ -93,7 +95,7 @@ export const CarSearch: Component<CarSearchProps> = (props) => {
   }
 
   const handleDelete = async () => {
-    if (props.editCarId && confirm('Delete this car profile?')) {
+    if (props.editCarId && confirm(i18n['Delete this car profile?'])) {
       await removeCar(props.editCarId)
       await queryClient.invalidateQueries({ queryKey: ['appState'] })
       props.onDone()
@@ -105,16 +107,16 @@ export const CarSearch: Component<CarSearchProps> = (props) => {
       <div class={s.pageHeader}>
         <div class={s.breadcrumb}>
           <span class={`material-symbols-outlined ${s.iconSm}`}>directions_car</span>
-          <span class={s.breadcrumbText}>Vehicle Management</span>
+          <span class={s.breadcrumbText}>{i18n['Vehicle Management']}</span>
         </div>
         <h1 class={s.pageTitle}>
           {props.editCarId ? (
             <>
-              Edit Car <span class={s.pageTitleAccent}>Profile</span>
+              {i18n['Edit Car']} <span class={s.pageTitleAccent}>{i18n['Profile']}</span>
             </>
           ) : (
             <>
-              Add <span class={s.pageTitleAccent}>Vehicle</span>
+              {i18n['Add']} <span class={s.pageTitleAccent}>{i18n['Vehicle']}</span>
             </>
           )}
         </h1>
@@ -125,14 +127,14 @@ export const CarSearch: Component<CarSearchProps> = (props) => {
           <input
             class={s.searchInput}
             type="text"
-            placeholder='Search e.g. "Toyota Corolla 2020"'
+            placeholder={i18n['Search e.g. "Toyota Corolla 2020"']}
             value={query()}
             onInput={(e) => handleSearch(e.currentTarget.value)}
             autofocus
           />
 
           <Show when={loading()}>
-            <span class={s.statusText}>Searching...</span>
+            <span class={s.statusText}>{i18n['Searching...']}</span>
           </Show>
 
           <Show when={!loading() && results().length > 0}>
@@ -153,11 +155,11 @@ export const CarSearch: Component<CarSearchProps> = (props) => {
           </Show>
 
           <Show when={!loading() && query().length >= 2 && results().length === 0}>
-            <span class={s.statusText}>No results found</span>
+            <span class={s.statusText}>{i18n['No results found']}</span>
           </Show>
 
           <button class={s.toggleLink} onClick={() => setShowManual(!showManual())}>
-            {showManual() ? 'Search instead' : 'Enter manually'}
+            {showManual() ? i18n['Search instead'] : i18n['Enter manually']}
           </button>
         </Show>
 
@@ -179,7 +181,7 @@ export const CarSearch: Component<CarSearchProps> = (props) => {
         <Show when={props.editCarId}>
           <button class={s.deleteButton} onClick={handleDelete}>
             <span class={`material-symbols-outlined ${s.iconMd}`}>delete</span>
-            Delete this car
+            {i18n['Delete this car']}
           </button>
         </Show>
       </Show>

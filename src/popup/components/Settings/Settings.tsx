@@ -5,12 +5,14 @@ import { getAppState, updateSettings, updateFuelPrices } from '@utils/storage'
 import { AVERAGE_CAR_ID, type Currency, type DistanceUnit, type EfficiencyUnit } from '@utils/types'
 import { fetchFuelPrices } from '@utils/fuelPrices'
 import { AnalyticsEvents, isOptedOut, setOptOut } from '@utils/analytics'
+import { useI18n, substitute } from '@utils/i18n'
 
 interface SettingsProps {
   onBack: () => void
 }
 
 export const Settings: Component<SettingsProps> = () => {
+  const i18n = useI18n()
   const queryClient = useQueryClient()
   const [refreshing, setRefreshing] = createSignal(false)
   const [analyticsOptOut, setAnalyticsOptOut] = createSignal(false)
@@ -84,50 +86,50 @@ export const Settings: Component<SettingsProps> = () => {
     await updateFuelPrices({
       ...current,
       [field]: num,
-      source: 'Manual override',
+      source: i18n['Manual override'],
       lastUpdated: Date.now(),
     })
     await refreshState()
   }
 
   const formatLastUpdated = (ts: number): string => {
-    if (!ts) return 'Never'
+    if (!ts) return i18n['Never']
     const d = new Date(ts)
     const now = new Date()
     const diffMs = now.getTime() - d.getTime()
     const diffHrs = Math.floor(diffMs / 3600000)
-    if (diffHrs < 1) return 'Just now'
-    if (diffHrs < 24) return `${diffHrs}h ago`
+    if (diffHrs < 1) return i18n['Just now']
+    if (diffHrs < 24) return substitute(i18n['{{hours}}h ago'], { hours: String(diffHrs) })
     return d.toLocaleDateString()
   }
 
   return (
-    <Show when={state()} fallback={<div class={s.container}>Loading...</div>}>
+    <Show when={state()} fallback={<div class={s.container}>{i18n['Loading...']}</div>}>
       {(appState) => (
         <div class={s.container}>
           <div class={s.pageHeader}>
-            <h1 class={s.pageTitle}>System Config</h1>
-            <p class={s.pageSubtitle}>Fine-tune your navigation experience</p>
+            <h1 class={s.pageTitle}>{i18n['System Config']}</h1>
+            <p class={s.pageSubtitle}>{i18n['Fine-tune your navigation experience']}</p>
           </div>
 
           <div class={s.unitsGrid}>
             <div class={s.unitCard}>
               <div class={s.unitCardHeader}>
                 <span class={`material-symbols-outlined ${s.iconColorPrimary}`}>distance</span>
-                <span class={s.unitCardTitle}>Distance</span>
+                <span class={s.unitCardTitle}>{i18n['Distance']}</span>
               </div>
               <div class={s.segmentedControl}>
                 <button
                   class={`${s.segmentButton} ${appState().settings.distanceUnit === 'km' ? s.segmentButtonActive : ''}`}
                   onClick={() => handleDistanceUnit('km')}
                 >
-                  KM
+                  {i18n['KM']}
                 </button>
                 <button
                   class={`${s.segmentButton} ${appState().settings.distanceUnit === 'miles' ? s.segmentButtonActive : ''}`}
                   onClick={() => handleDistanceUnit('miles')}
                 >
-                  MI
+                  {i18n['MI']}
                 </button>
               </div>
             </div>
@@ -135,16 +137,16 @@ export const Settings: Component<SettingsProps> = () => {
             <div class={s.unitCard}>
               <div class={s.unitCardHeader}>
                 <span class={`material-symbols-outlined ${s.iconColorTertiary}`}>speed</span>
-                <span class={s.unitCardTitle}>Efficiency</span>
+                <span class={s.unitCardTitle}>{i18n['Efficiency']}</span>
               </div>
               <select
                 class={s.select}
                 value={appState().settings.efficiencyUnit}
                 onChange={(e) => handleEfficiencyUnit(e.currentTarget.value as EfficiencyUnit)}
               >
-                <option value="l100km">L/100km</option>
-                <option value="mpg">MPG</option>
-                <option value="kwh100km">kWh/100km</option>
+                <option value="l100km">{i18n['L/100km']}</option>
+                <option value="mpg">{i18n['MPG']}</option>
+                <option value="kwh100km">{i18n['kWh/100km']}</option>
               </select>
             </div>
           </div>
@@ -156,8 +158,8 @@ export const Settings: Component<SettingsProps> = () => {
                   <span class={`material-symbols-outlined ${s.iconColorSecondary}`}>payments</span>
                 </div>
                 <div class={s.rowText}>
-                  <span class={s.label}>Currency</span>
-                  <span class={s.sublabel}>Used for all cost projections</span>
+                  <span class={s.label}>{i18n['Currency']}</span>
+                  <span class={s.sublabel}>{i18n['Used for all cost projections']}</span>
                 </div>
               </div>
               <select
@@ -165,14 +167,14 @@ export const Settings: Component<SettingsProps> = () => {
                 value={appState().settings.currency}
                 onChange={(e) => handleCurrency(e.currentTarget.value as Currency)}
               >
-                <option value="AUD">AUD ($)</option>
-                <option value="USD">USD ($)</option>
-                <option value="GBP">GBP (£)</option>
-                <option value="EUR">EUR (€)</option>
-                <option value="NZD">NZD ($)</option>
-                <option value="CAD">CAD ($)</option>
-                <option value="INR">INR (₹)</option>
-                <option value="JPY">JPY (¥)</option>
+                <option value="AUD">{i18n['AUD ($)']}</option>
+                <option value="USD">{i18n['USD ($)']}</option>
+                <option value="GBP">{i18n['GBP (£)']}</option>
+                <option value="EUR">{i18n['EUR (€)']}</option>
+                <option value="NZD">{i18n['NZD ($)']}</option>
+                <option value="CAD">{i18n['CAD ($)']}</option>
+                <option value="INR">{i18n['INR (₹)']}</option>
+                <option value="JPY">{i18n['JPY (¥)']}</option>
               </select>
             </div>
 
@@ -184,15 +186,15 @@ export const Settings: Component<SettingsProps> = () => {
                   <span class={`material-symbols-outlined ${s.iconColorPrimary}`}>monitoring</span>
                 </div>
                 <div class={s.rowText}>
-                  <span class={s.label}>Average Comparison</span>
-                  <span class={s.sublabel}>Show trip efficiency vs average</span>
+                  <span class={s.label}>{i18n['Average Comparison']}</span>
+                  <span class={s.sublabel}>{i18n['Show trip efficiency vs average']}</span>
                 </div>
               </div>
               <button
                 class={`${s.toggle} ${appState().settings.showAverageComparison && !isAverageActive() ? s.toggleActive : ''} ${isAverageActive() ? s.toggleDisabled : ''}`}
                 onClick={handleToggleComparison}
                 disabled={isAverageActive()}
-                aria-label="Toggle average comparison"
+                aria-label={i18n['Toggle average comparison']}
               >
                 <div
                   class={`${s.toggleKnob} ${appState().settings.showAverageComparison && !isAverageActive() ? s.toggleKnobActive : ''}`}
@@ -200,7 +202,9 @@ export const Settings: Component<SettingsProps> = () => {
               </button>
             </div>
             <Show when={isAverageActive()}>
-              <span class={s.hint}>Switch to a custom car to compare against the average</span>
+              <span class={s.hint}>
+                {i18n['Switch to a custom car to compare against the average']}
+              </span>
             </Show>
           </div>
 
@@ -209,14 +213,14 @@ export const Settings: Component<SettingsProps> = () => {
               <span class={`material-symbols-outlined ${s.iconColorTertiary}`}>
                 local_gas_station
               </span>
-              <span class={s.pricesTitle}>Market Rates</span>
+              <span class={s.pricesTitle}>{i18n['Market Rates']}</span>
             </div>
 
             <div class={s.pricesListColumn}>
               <div class={`${s.priceRow} ${s.priceRowPetrol}`}>
-                <span class={s.priceLabel}>Petrol (95)</span>
+                <span class={s.priceLabel}>{i18n['Petrol (95)']}</span>
                 <div class={s.priceInputGroup}>
-                  <span class={s.priceUnit}>per L</span>
+                  <span class={s.priceUnit}>{i18n['per L']}</span>
                   <input
                     class={`${s.priceInput} ${s.priceInputPetrol}`}
                     type="number"
@@ -228,9 +232,9 @@ export const Settings: Component<SettingsProps> = () => {
                 </div>
               </div>
               <div class={`${s.priceRow} ${s.priceRowDiesel}`}>
-                <span class={s.priceLabel}>Diesel</span>
+                <span class={s.priceLabel}>{i18n['Diesel']}</span>
                 <div class={s.priceInputGroup}>
-                  <span class={s.priceUnit}>per L</span>
+                  <span class={s.priceUnit}>{i18n['per L']}</span>
                   <input
                     class={`${s.priceInput} ${s.priceInputDiesel}`}
                     type="number"
@@ -242,9 +246,9 @@ export const Settings: Component<SettingsProps> = () => {
                 </div>
               </div>
               <div class={`${s.priceRow} ${s.priceRowElectric}`}>
-                <span class={s.priceLabel}>Electric</span>
+                <span class={s.priceLabel}>{i18n['Electric']}</span>
                 <div class={s.priceInputGroup}>
-                  <span class={s.priceUnit}>per kWh</span>
+                  <span class={s.priceUnit}>{i18n['per kWh']}</span>
                   <input
                     class={`${s.priceInput} ${s.priceInputElectric}`}
                     type="number"
@@ -263,7 +267,7 @@ export const Settings: Component<SettingsProps> = () => {
                 {formatLastUpdated(appState().fuelPrices.lastUpdated)}
               </span>
               <button class={s.refreshButton} onClick={handleRefreshPrices} disabled={refreshing()}>
-                {refreshing() ? 'Refreshing...' : 'Refresh'}
+                {refreshing() ? i18n['Refreshing...'] : i18n['Refresh']}
               </button>
             </div>
           </div>
@@ -277,14 +281,16 @@ export const Settings: Component<SettingsProps> = () => {
                   </span>
                 </div>
                 <div class={s.rowText}>
-                  <span class={s.label}>Anonymous Analytics</span>
-                  <span class={s.sublabel}>Help improve with non-identifiable data</span>
+                  <span class={s.label}>{i18n['Anonymous Analytics']}</span>
+                  <span class={s.sublabel}>
+                    {i18n['Help improve with non-identifiable data']}
+                  </span>
                 </div>
               </div>
               <button
                 class={`${s.toggle} ${analyticsOptOut() ? s.toggleActive : ''}`}
                 onClick={handleAnalyticsToggle}
-                aria-label="Toggle analytics opt-out"
+                aria-label={i18n['Toggle analytics opt-out']}
               >
                 <div class={`${s.toggleKnob} ${analyticsOptOut() ? s.toggleKnobActive : ''}`} />
               </button>

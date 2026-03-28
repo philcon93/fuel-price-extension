@@ -5,8 +5,10 @@ import type { TripRecord } from '@utils/types'
 import { formatCost } from '@utils/calculator'
 import type { Currency } from '@utils/types'
 import { getRecentTrips, getTripStats, clearTripHistory } from '@utils/tripHistory'
+import { useI18n, substitute } from '@utils/i18n'
 
 export const TripHistory: Component = () => {
+  const i18n = useI18n()
   const queryClient = useQueryClient()
 
   const tripsQuery = createQuery(() => ({
@@ -24,7 +26,7 @@ export const TripHistory: Component = () => {
   const loading = () => tripsQuery.isLoading || statsQuery.isLoading
 
   const handleClear = async () => {
-    if (!confirm('Clear all trip history?')) return
+    if (!confirm(i18n['Clear all trip history?'])) return
     await clearTripHistory()
     await queryClient.invalidateQueries({ queryKey: ['tripHistory'] })
     await queryClient.invalidateQueries({ queryKey: ['tripStats'] })
@@ -35,16 +37,16 @@ export const TripHistory: Component = () => {
     const now = new Date()
     const diffMs = now.getTime() - d.getTime()
     const diffMins = Math.floor(diffMs / 60000)
-    if (diffMins < 1) return 'Just now'
-    if (diffMins < 60) return `${diffMins}m ago`
+    if (diffMins < 1) return i18n['Just now']
+    if (diffMins < 60) return substitute(i18n['{{mins}}m ago'], { mins: String(diffMins) })
     const diffHrs = Math.floor(diffMins / 60)
-    if (diffHrs < 24) return `${diffHrs}h ago`
+    if (diffHrs < 24) return substitute(i18n['{{hours}}h ago'], { hours: String(diffHrs) })
     return d.toLocaleDateString()
   }
 
   const formatDistance = (km: number): string => {
-    if (km < 1) return `${Math.round(km * 1000)}m`
-    return `${km.toFixed(1)} km`
+    if (km < 1) return substitute(i18n['{{distance}}m'], { distance: String(Math.round(km * 1000)) })
+    return substitute(i18n['{{distance}} km'], { distance: km.toFixed(1) })
   }
 
   const defaultCurrency = (): Currency => {
@@ -65,11 +67,11 @@ export const TripHistory: Component = () => {
 
   const fuelLabel = (fuelType: string): string => {
     const labels: Record<string, string> = {
-      petrol: 'Petrol',
-      diesel: 'Diesel',
-      hybrid: 'Hybrid',
-      phev: 'PHEV',
-      electric: 'Electric',
+      petrol: i18n['Petrol'],
+      diesel: i18n['Diesel'],
+      hybrid: i18n['Hybrid'],
+      phev: i18n['PHEV'],
+      electric: i18n['Electric'],
     }
     return labels[fuelType] ?? fuelType
   }
@@ -78,46 +80,48 @@ export const TripHistory: Component = () => {
     fuelType in s.fuelChipVariant ? (fuelType as keyof typeof s.fuelChipVariant) : 'petrol'
 
   return (
-    <Show when={!loading()} fallback={<div class={s.container}>Loading...</div>}>
+    <Show when={!loading()} fallback={<div class={s.container}>{i18n['Loading...']}</div>}>
       <div class={s.container}>
         <Show
           when={stats().totalTrips > 0}
           fallback={
             <div class={s.emptyState}>
-              No trips recorded yet. Navigate on Google Maps to see your fuel cost history here.
+              {i18n['No trips recorded yet. Navigate on Google Maps to see your fuel cost history here.']}
             </div>
           }
         >
           <div class={s.statsGrid}>
             <div class={`${s.statCard} ${s.statCardPrimary}`}>
-              <span class={s.statLabel}>Total Trips</span>
+              <span class={s.statLabel}>{i18n['Total Trips']}</span>
               <span class={`${s.statValue} ${s.statValuePrimary}`}>{stats().totalTrips}</span>
             </div>
             <div class={`${s.statCard} ${s.statCardSecondary}`}>
-              <span class={s.statLabel}>Total Spent</span>
+              <span class={s.statLabel}>{i18n['Total Spent']}</span>
               <span class={`${s.statValue} ${s.statValueSecondary}`}>
                 {formatCost(stats().totalCost, defaultCurrency())}
               </span>
             </div>
             <div class={`${s.statCard} ${s.statCardTertiary}`}>
-              <span class={s.statLabel}>Total Dist.</span>
+              <span class={s.statLabel}>{i18n['Total Dist.']}</span>
               <span class={`${s.statValue} ${s.statValueTertiary}`}>
                 {stats().totalDistanceKm < 1
                   ? `${Math.round(stats().totalDistanceKm * 1000)}`
                   : stats().totalDistanceKm.toFixed(1)}
-                <span class={s.statUnit}>{stats().totalDistanceKm < 1 ? 'm' : 'km'}</span>
+                <span class={s.statUnit}>
+                  {stats().totalDistanceKm < 1 ? i18n['m'] : i18n['km']}
+                </span>
               </span>
             </div>
           </div>
 
           <div class={s.sectionHeader}>
             <div>
-              <h3 class={s.sectionTitle}>Recent Activity</h3>
-              <p class={s.sectionSubtitle}>Your kinetic footprint</p>
+              <h3 class={s.sectionTitle}>{i18n['Recent Activity']}</h3>
+              <p class={s.sectionSubtitle}>{i18n['Your kinetic footprint']}</p>
             </div>
             <button class={s.clearButton} onClick={handleClear}>
               <span class={`material-symbols-outlined ${s.iconSm}`}>delete_sweep</span>
-              Clear History
+              {i18n['Clear History']}
             </button>
           </div>
 

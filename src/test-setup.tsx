@@ -2,6 +2,7 @@ import { vi, afterEach } from 'vitest'
 import { cleanup } from '@solidjs/testing-library'
 import '@testing-library/jest-dom/vitest'
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
+import { I18nProvider } from '@utils/i18n'
 import type { JSX } from 'solid-js'
 
 afterEach(() => {
@@ -21,7 +22,11 @@ export function createTestQueryClient() {
 
 export function withQueryProvider(ui: () => JSX.Element): () => JSX.Element {
   const client = createTestQueryClient()
-  return () => <QueryClientProvider client={client}>{ui()}</QueryClientProvider>
+  return () => (
+    <QueryClientProvider client={client}>
+      <I18nProvider>{ui()}</I18nProvider>
+    </QueryClientProvider>
+  )
 }
 
 const syncStore: Record<string, unknown> = {}
