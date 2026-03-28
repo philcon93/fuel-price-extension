@@ -8,7 +8,7 @@ interface ManualEntryProps {
   onSave: () => void
 }
 
-const ManualEntry: Component<ManualEntryProps> = (props) => {
+export const ManualEntry: Component<ManualEntryProps> = (props) => {
   const car = () => props.existingCar
   const [nickname, setNickname] = createSignal(car()?.nickname ?? '')
   const [fuelType, setFuelType] = createSignal<FuelType>(car()?.fuelType ?? 'petrol')
@@ -137,5 +137,3 @@ const ManualEntry: Component<ManualEntryProps> = (props) => {
     </div>
   )
 }
-
-export { ManualEntry }

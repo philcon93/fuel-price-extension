@@ -14,7 +14,7 @@ interface SettingsProps {
   onBack: () => void
 }
 
-const Settings: Component<SettingsProps> = () => {
+export const Settings: Component<SettingsProps> = () => {
   const [state, setState] = createSignal<AppState | null>(null)
   const [refreshing, setRefreshing] = createSignal(false)
 
@@ -209,5 +209,3 @@ const Settings: Component<SettingsProps> = () => {
     </Show>
   )
 }
-
-export { Settings }

@@ -9,7 +9,7 @@ interface HeaderProps {
   showSettings: boolean
 }
 
-const Header: Component<HeaderProps> = (props) => {
+export const Header: Component<HeaderProps> = (props) => {
   return (
     <header class={s.header}>
       <div class={s.headerLeft}>
@@ -47,5 +47,3 @@ const Header: Component<HeaderProps> = (props) => {
     </header>
   )
 }
-
-export { Header }

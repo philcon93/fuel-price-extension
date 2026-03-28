@@ -7,7 +7,7 @@ import { Home } from '@components/Home'
 import { CarSearch } from '@components/CarSearch'
 import { Settings } from '@components/Settings'
 
-const App: Component = () => {
+export const App: Component = () => {
   const [view, setView] = createSignal<PopupView>({ kind: 'home' })
 
   const title = () => {
@@ -60,5 +60,3 @@ const App: Component = () => {
     </div>
   )
 }
-
-export { App }

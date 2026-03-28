@@ -10,7 +10,7 @@ interface HomeProps {
   onSettings: () => void
 }
 
-const Home: Component<HomeProps> = (props) => {
+export const Home: Component<HomeProps> = (props) => {
   const [state, setState] = createSignal<AppState | null>(null)
 
   onMount(async () => {
@@ -143,5 +143,3 @@ const Home: Component<HomeProps> = (props) => {
     </Show>
   )
 }
-
-export { Home }

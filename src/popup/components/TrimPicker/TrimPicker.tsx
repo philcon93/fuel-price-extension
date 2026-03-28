@@ -11,7 +11,7 @@ interface TrimPickerProps {
   onBack: () => void
 }
 
-const TrimPicker: Component<TrimPickerProps> = (props) => {
+export const TrimPicker: Component<TrimPickerProps> = (props) => {
   const [trims, setTrims] = createSignal<CarQueryTrim[]>([])
   const [loading, setLoading] = createSignal(true)
 
@@ -68,5 +68,3 @@ const TrimPicker: Component<TrimPickerProps> = (props) => {
     </div>
   )
 }
-
-export { TrimPicker }

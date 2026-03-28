@@ -11,7 +11,7 @@ interface CarSearchProps {
   onDone: () => void
 }
 
-const CarSearch: Component<CarSearchProps> = (props) => {
+export const CarSearch: Component<CarSearchProps> = (props) => {
   const [query, setQuery] = createSignal('')
   const [results, setResults] = createSignal<CarResult[]>([])
   const [loading, setLoading] = createSignal(false)
@@ -162,5 +162,3 @@ function mapFuelType(fuel: string): CarProfile['fuelType'] {
   if (f.includes('hybrid') || f.includes('phev')) return 'hybrid'
   return 'petrol'
 }
-
-export { CarSearch }
