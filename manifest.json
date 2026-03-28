@@ -1,0 +1,71 @@
+{
+  "manifest_version": 3,
+  "name": "Fuel Cost for Google Maps",
+  "version": "1.0.0",
+  "description": "See how much your journey will cost in fuel — right inside Google Maps. Supports car lookup by name, live fuel prices, and multi-car comparison.",
+  "icons": {
+    "16": "public/icons/icon16.png",
+    "48": "public/icons/icon48.png",
+    "128": "public/icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "src/popup/index.html",
+    "default_icon": {
+      "16": "public/icons/icon16.png",
+      "48": "public/icons/icon48.png",
+      "128": "public/icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "src/background/index.ts",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.google.com/maps/*",
+        "https://*.google.com.au/maps/*",
+        "https://*.google.co.uk/maps/*",
+        "https://*.google.ca/maps/*",
+        "https://*.google.co.nz/maps/*",
+        "https://*.google.de/maps/*",
+        "https://*.google.fr/maps/*",
+        "https://*.google.es/maps/*",
+        "https://*.google.it/maps/*",
+        "https://*.google.co.in/maps/*",
+        "https://*.google.co.jp/maps/*",
+        "https://maps.google.com/*",
+        "https://maps.google.com.au/*",
+        "https://maps.google.co.uk/*",
+        "https://maps.google.ca/*",
+        "https://maps.google.co.nz/*",
+        "https://maps.google.de/*",
+        "https://maps.google.fr/*",
+        "https://maps.google.es/*",
+        "https://maps.google.it/*",
+        "https://maps.google.co.in/*",
+        "https://maps.google.co.jp/*"
+      ],
+      "js": ["src/content/index.ts"],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": [
+    "storage",
+    "activeTab",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://*.google.com/maps/*",
+    "https://*.google.com.au/maps/*",
+    "https://*.google.co.uk/maps/*",
+    "https://*.google.ca/maps/*",
+    "https://*.google.co.nz/maps/*",
+    "https://maps.google.com/*",
+    "https://maps.google.com.au/*",
+    "https://maps.google.co.uk/*",
+    "https://maps.google.ca/*",
+    "https://maps.google.co.nz/*",
+    "http://www.carqueryapi.com/*"
+  ]
+}
