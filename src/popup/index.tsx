@@ -28,6 +28,13 @@ const queryClient = new QueryClient({
   },
 })
 
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === 'local' && changes.fuelCostTrips) {
+    queryClient.invalidateQueries({ queryKey: ['tripHistory'] })
+    queryClient.invalidateQueries({ queryKey: ['tripStats'] })
+  }
+})
+
 const root = document.getElementById('root')
 if (root) {
   render(

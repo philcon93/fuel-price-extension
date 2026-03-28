@@ -5,6 +5,7 @@ import injectedCss from './injected.css?inline'
 const TRIP_STORAGE_KEY = 'fuelCostTrips'
 const MAX_TRIPS = 200
 const DEDUP_WINDOW_MS = 30_000
+const TRIP_FLUSH_DELAY_MS = 1_000
 
 async function recordTripToStorage(trip: Omit<TripRecord, 'id'>): Promise<void> {
   try {
@@ -27,6 +28,27 @@ async function recordTripToStorage(trip: Omit<TripRecord, 'id'>): Promise<void> 
     await chrome.storage.local.set({ [TRIP_STORAGE_KEY]: { trips: updated } })
   } catch {
     // Non-critical — trip recording failure shouldn't break the UI
+  }
+}
+
+const pendingTrips = new Map<string, Omit<TripRecord, 'id'>>()
+let flushTimer: ReturnType<typeof setTimeout> | null = null
+
+function queueTrip(trip: Omit<TripRecord, 'id'>) {
+  const existing = pendingTrips.get(trip.carId)
+  if (!existing || trip.distanceKm > existing.distanceKm) {
+    pendingTrips.set(trip.carId, trip)
+  }
+
+  if (flushTimer) clearTimeout(flushTimer)
+  flushTimer = setTimeout(flushPendingTrips, TRIP_FLUSH_DELAY_MS)
+}
+
+async function flushPendingTrips() {
+  const trips = Array.from(pendingTrips.values())
+  pendingTrips.clear()
+  for (const trip of trips) {
+    await recordTripToStorage(trip)
   }
 }
 
@@ -154,7 +176,7 @@ async function processDistanceElement(el: Element, distanceText: string) {
     return
   }
 
-  recordTripToStorage({
+  queueTrip({
     timestamp: Date.now(),
     distanceKm,
     fuelCost: cost,
