@@ -39,7 +39,7 @@ The extension works immediately with an "Average Car" profile based on your regi
 3. Pick the matching trim from the results
 4. Your car is now active — fuel costs on Google Maps will use its efficiency
 
-You can also enter specs manually if your car isn't in the database.
+You can also enter specs manually if your car isn't in the database. The lookup database (CarQuery) covers models up to 2022 — for newer cars, use manual entry.
 
 ### Trip history
 
@@ -49,7 +49,7 @@ Every fuel cost the extension calculates is stored locally in your browser. Open
 - A list of recent calculations with car name, distance, and cost
 - A button to clear your history
 
-No trip data leaves your device — it's stored in IndexedDB in the extension's context.
+No trip data leaves your device — it's stored in `chrome.storage.local`.
 
 ### Settings
 
@@ -117,8 +117,9 @@ Without a PostHog key, all analytics calls are no-ops. Users can also disable an
 | Styling            | Vanilla Extract (popup), plain CSS in Shadow DOM (content script) |
 | Language           | TypeScript                                                        |
 | Extension standard | Chrome Manifest V3                                                |
+| Data fetching      | @tanstack/solid-query                                            |
 | Testing            | Vitest + @solidjs/testing-library + @testing-library/jest-dom     |
-| Local storage      | chrome.storage (state), IndexedDB via Dexie.js (trip history)     |
+| Local storage      | chrome.storage.sync (state), chrome.storage.local (trips, cache) |
 | Analytics          | PostHog (optional, with user opt-out)                             |
 | Linting            | ESLint with typescript-eslint + eslint-plugin-solid               |
 | Formatting         | Prettier                                                          |
@@ -138,14 +139,14 @@ src/
       TripHistory/
     styles/               # Vanilla Extract theme and global styles
   content/                # Content script injected into Google Maps
-  background/             # Service worker for alarms and message passing
+  background/             # Service worker for alarms and fuel price refresh
   utils/                  # Shared utilities (each in its own directory)
     analytics/            # PostHog analytics wrapper with opt-out
     calculator/           # Pure fuel cost calculation functions
-    carLookup/            # CarQuery API integration (via background fetch)
+    carLookup/            # CarQuery API integration (direct fetch)
     fuelPrices/           # Per-country fuel price data and caching
     storage/              # chrome.storage helpers
-    tripHistory/          # IndexedDB trip recording via Dexie.js
+    tripHistory/          # Trip recording via chrome.storage.local
     types/                # Shared TypeScript interfaces
 ```
 
