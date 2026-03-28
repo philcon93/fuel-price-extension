@@ -1,10 +1,10 @@
 import { createSignal, Show, For, type Component } from 'solid-js'
 import * as s from './CarSearch.css'
-import { searchCars, type CarResult } from '../../utils/carLookup'
-import { addCar, getAppState, updateCar, removeCar } from '../../utils/storage'
-import ManualEntry from './ManualEntry'
-import TrimPicker from './TrimPicker'
-import type { CarProfile, CarQueryTrim } from '../../utils/types'
+import { searchCars, type CarResult } from '../../../utils/carLookup'
+import { addCar, getAppState, removeCar } from '../../../utils/storage'
+import ManualEntry from '../ManualEntry/ManualEntry'
+import TrimPicker from '../TrimPicker/TrimPicker'
+import type { CarProfile, CarQueryTrim } from '../../../utils/types'
 
 interface CarSearchProps {
   editCarId?: string
