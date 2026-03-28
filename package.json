@@ -11,6 +11,11 @@
   "dependencies": {
     "solid-js": "^1.9.12"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  },
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.4.0",
     "@types/chrome": "^0.1.38",
