@@ -9,7 +9,7 @@ import {
   updateSettings,
   updateFuelPrices,
 } from './storage'
-import { AVERAGE_CAR_ID, type FuelPrices } from '@utils/types/types'
+import { AVERAGE_CAR_ID, type FuelPrices } from '@utils/types'
 
 beforeEach(() => {
   resetChromeStores()

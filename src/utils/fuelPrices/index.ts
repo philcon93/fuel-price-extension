@@ -1,0 +1,1 @@
+export { fetchFuelPrices } from './fuelPrices'

@@ -1,7 +1,7 @@
 import { createSignal, type Component } from 'solid-js'
 import * as s from './ManualEntry.css'
-import { addCar, updateCar } from '@utils/storage/storage'
-import type { CarProfile, FuelType } from '@utils/types/types'
+import { addCar, updateCar } from '@utils/storage'
+import type { CarProfile, FuelType } from '@utils/types'
 
 interface ManualEntryProps {
   existingCar?: CarProfile

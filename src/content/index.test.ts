@@ -1,12 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import {
-  parseDistanceText,
-  convertDistance,
-  calcTripCost,
-  formatCost,
-} from '@utils/calculator/calculator'
-import { AVERAGE_CAR_ID } from '@utils/types/types'
-import type { CarProfile, FuelPrices, AppState } from '@utils/types/types'
+import { parseDistanceText, convertDistance, calcTripCost, formatCost } from '@utils/calculator'
+import { AVERAGE_CAR_ID } from '@utils/types'
+import type { CarProfile, FuelPrices, AppState } from '@utils/types'
 
 describe('content script logic', () => {
   const prices: FuelPrices = {

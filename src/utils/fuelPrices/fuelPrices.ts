@@ -1,4 +1,4 @@
-import type { Currency, FuelPrices } from '@utils/types/types'
+import type { Currency, FuelPrices } from '@utils/types'
 
 const CACHE_KEY = 'fuelPriceCache'
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000 // 24 hours

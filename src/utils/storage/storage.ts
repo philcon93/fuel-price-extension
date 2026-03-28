@@ -6,7 +6,7 @@ import {
   type DistanceUnit,
   type FuelPrices,
   type UserSettings,
-} from '@utils/types/types'
+} from '@utils/types'
 
 const STORAGE_KEY = 'fuelCostAppState'
 

@@ -1,4 +1,4 @@
-import type { CarQueryTrim } from '@utils/types/types'
+import type { CarQueryTrim } from '@utils/types'
 
 const API_BASE = 'https://www.carqueryapi.com/api/0.3/'
 
