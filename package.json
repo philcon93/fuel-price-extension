@@ -17,7 +17,6 @@
   },
   "dependencies": {
     "@tanstack/solid-query": "^5.95.2",
-    "dexie": "^4.4.1",
     "posthog-js": "^1.364.1",
     "solid-js": "^1.9.12"
   },
@@ -37,7 +36,6 @@
     "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-solid": "^0.14.5",
-    "fake-indexeddb": "^6.2.5",
     "jsdom": "^29.0.1",
     "prettier": "^3.8.1",
     "typescript": "^5.9.3",

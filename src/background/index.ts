@@ -1,6 +1,5 @@
 import { fetchFuelPrices } from '@utils/fuelPrices'
 import { getAppState, updateFuelPrices } from '@utils/storage'
-import { recordTrip, getRecentTrips, getTripStats, clearTripHistory } from '@utils/tripHistory'
 
 const ALARM_NAME = 'refreshFuelPrices'
 
@@ -56,42 +55,8 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true
   }
 
-  if (message.type === 'CAR_QUERY_FETCH') {
-    fetch(message.url)
-      .then((res) => res.json())
-      .then(sendResponse)
-      .catch(() => sendResponse(null))
-    return true
-  }
-
-  if (message.type === 'RECORD_TRIP') {
-    recordTrip(message.trip).then(() => sendResponse(true))
-    return true
-  }
-
-  if (message.type === 'GET_TRIP_HISTORY') {
-    getRecentTrips(message.limit)
-      .then(sendResponse)
-      .catch(() => sendResponse([]))
-    return true
-  }
-
-  if (message.type === 'GET_TRIP_STATS') {
-    getTripStats()
-      .then(sendResponse)
-      .catch(() => sendResponse({ totalTrips: 0, totalCost: 0, totalDistanceKm: 0 }))
-    return true
-  }
-
   if (message.type === 'TRACK_FUEL_CALC') {
     sendResponse(true)
     return false
-  }
-
-  if (message.type === 'CLEAR_TRIP_HISTORY') {
-    clearTripHistory()
-      .then(() => sendResponse(true))
-      .catch(() => sendResponse(false))
-    return true
   }
 })

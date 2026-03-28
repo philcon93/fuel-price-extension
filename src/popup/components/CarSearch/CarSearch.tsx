@@ -156,7 +156,7 @@ export const CarSearch: Component<CarSearchProps> = (props) => {
         </Show>
       </Show>
 
-      <Show when={showManual() || props.editCarId}>
+      <Show when={props.editCarId ? editCar() : showManual()}>
         <ManualEntry existingCar={editCar() ?? undefined} onSave={props.onDone} />
         <Show when={props.editCarId}>
           <button class={s.deleteButton} onClick={handleDelete}>
