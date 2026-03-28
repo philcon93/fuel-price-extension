@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import ManualEntry from './ManualEntry'
+import { ManualEntry } from './ManualEntry'
 
 describe('ManualEntry', () => {
   it('exports a component function', () => {

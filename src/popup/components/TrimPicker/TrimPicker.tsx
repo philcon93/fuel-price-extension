@@ -69,4 +69,4 @@ const TrimPicker: Component<TrimPickerProps> = (props) => {
   )
 }
 
-export default TrimPicker
+export { TrimPicker }

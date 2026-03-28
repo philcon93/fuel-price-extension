@@ -144,4 +144,4 @@ const Home: Component<HomeProps> = (props) => {
   )
 }
 
-export default Home
+export { Home }

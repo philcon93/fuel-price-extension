@@ -210,4 +210,4 @@ const Settings: Component<SettingsProps> = () => {
   )
 }
 
-export default Settings
+export { Settings }

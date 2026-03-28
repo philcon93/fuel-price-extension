@@ -48,4 +48,4 @@ const Header: Component<HeaderProps> = (props) => {
   )
 }
 
-export default Header
+export { Header }

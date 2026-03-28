@@ -1,1 +1,1 @@
-export { default } from './TrimPicker'
+export { TrimPicker } from './TrimPicker'

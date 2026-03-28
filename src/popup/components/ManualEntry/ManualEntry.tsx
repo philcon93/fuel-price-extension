@@ -138,4 +138,4 @@ const ManualEntry: Component<ManualEntryProps> = (props) => {
   )
 }
 
-export default ManualEntry
+export { ManualEntry }

@@ -1,1 +1,1 @@
-export { default } from './CarSearch'
+export { CarSearch } from './CarSearch'

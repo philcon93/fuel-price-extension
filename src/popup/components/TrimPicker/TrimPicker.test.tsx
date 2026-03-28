@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import TrimPicker from './TrimPicker'
+import { TrimPicker } from './TrimPicker'
 
 describe('TrimPicker', () => {
   it('exports a component function', () => {

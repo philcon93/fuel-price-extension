@@ -1,1 +1,1 @@
-export { default } from './ManualEntry'
+export { ManualEntry } from './ManualEntry'

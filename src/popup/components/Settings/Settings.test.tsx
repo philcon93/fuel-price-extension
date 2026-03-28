@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import Settings from './Settings'
+import { Settings } from './Settings'
 
 describe('Settings', () => {
   it('exports a component function', () => {
