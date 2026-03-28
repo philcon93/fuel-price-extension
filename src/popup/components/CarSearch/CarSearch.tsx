@@ -1,4 +1,4 @@
-import { createSignal, Show, For, type Component } from 'solid-js'
+import { createSignal, createEffect, Show, For, type Component } from 'solid-js'
 import * as s from './CarSearch.css'
 import { searchCars, type CarResult } from '../../../utils/carLookup'
 import { addCar, getAppState, removeCar } from '../../../utils/storage'
@@ -15,16 +15,20 @@ const CarSearch: Component<CarSearchProps> = (props) => {
   const [query, setQuery] = createSignal('')
   const [results, setResults] = createSignal<CarResult[]>([])
   const [loading, setLoading] = createSignal(false)
-  const [showManual, setShowManual] = createSignal(!!props.editCarId)
+  const [showManual, setShowManual] = createSignal(false)
   const [selectedResult, setSelectedResult] = createSignal<CarResult | null>(null)
   const [editCar, setEditCar] = createSignal<CarProfile | null>(null)
 
-  if (props.editCarId) {
-    getAppState().then((state) => {
-      const car = state.cars.find((c) => c.id === props.editCarId)
-      if (car) setEditCar(car)
-    })
-  }
+  createEffect(() => {
+    const id = props.editCarId
+    if (id) {
+      setShowManual(true)
+      getAppState().then((state) => {
+        const car = state.cars.find((c) => c.id === id)
+        if (car) setEditCar(car)
+      })
+    }
+  })
 
   let debounceTimer: ReturnType<typeof setTimeout>
 

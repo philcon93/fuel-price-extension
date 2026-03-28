@@ -8,7 +8,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix"
   },
   "dependencies": {
     "solid-js": "^1.9.12"
@@ -24,8 +26,12 @@
     "@vanilla-extract/css": "^1.20.0",
     "@vanilla-extract/sprinkles": "^1.6.5",
     "@vanilla-extract/vite-plugin": "^5.2.1",
+    "eslint": "^9.39.4",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-solid": "^0.14.5",
     "prettier": "^3.8.1",
-    "typescript": "^6.0.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.57.2",
     "vite": "^8.0.3",
     "vite-plugin-solid": "^2.11.11"
   }

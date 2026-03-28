@@ -9,14 +9,14 @@ interface ManualEntryProps {
 }
 
 const ManualEntry: Component<ManualEntryProps> = (props) => {
-  const car = props.existingCar
-  const [nickname, setNickname] = createSignal(car?.nickname ?? '')
-  const [fuelType, setFuelType] = createSignal<FuelType>(car?.fuelType ?? 'petrol')
-  const [engineSize, setEngineSize] = createSignal(car?.engineSizeL?.toString() ?? '')
+  const car = () => props.existingCar
+  const [nickname, setNickname] = createSignal(car()?.nickname ?? '')
+  const [fuelType, setFuelType] = createSignal<FuelType>(car()?.fuelType ?? 'petrol')
+  const [engineSize, setEngineSize] = createSignal(car()?.engineSizeL?.toString() ?? '')
   const [efficiency, setEfficiency] = createSignal(
-    (car?.realWorldL100km ?? car?.officialL100km ?? '').toString(),
+    (car()?.realWorldL100km ?? car()?.officialL100km ?? '').toString(),
   )
-  const [kwhEfficiency, setKwhEfficiency] = createSignal((car?.kWh100km ?? '').toString())
+  const [kwhEfficiency, setKwhEfficiency] = createSignal((car()?.kWh100km ?? '').toString())
 
   const isValid = () => {
     if (!nickname().trim()) return false
@@ -45,8 +45,9 @@ const ManualEntry: Component<ManualEntryProps> = (props) => {
       isManual: true,
     }
 
-    if (car) {
-      await updateCar(car.id, profile)
+    const existingCar = car()
+    if (existingCar) {
+      await updateCar(existingCar.id, profile)
     } else {
       await addCar(profile)
     }
@@ -131,7 +132,7 @@ const ManualEntry: Component<ManualEntryProps> = (props) => {
       )}
 
       <button class={s.saveButton} onClick={handleSave} disabled={!isValid()}>
-        {props.existingCar ? 'Save changes' : 'Save car'}
+        {car() ? 'Save changes' : 'Save car'}
       </button>
     </div>
   )

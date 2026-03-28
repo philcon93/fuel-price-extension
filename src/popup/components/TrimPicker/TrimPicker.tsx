@@ -37,7 +37,7 @@ const TrimPicker: Component<TrimPickerProps> = (props) => {
 
   return (
     <div class={s.container}>
-      <button class={s.backLink} onClick={props.onBack}>
+      <button class={s.backLink} onClick={() => props.onBack()}>
         &larr; Back to search
       </button>
       <div class={s.heading}>

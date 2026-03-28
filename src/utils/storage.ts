@@ -4,7 +4,6 @@ import {
   type CarProfile,
   type Currency,
   type DistanceUnit,
-  type EfficiencyUnit,
   type FuelPrices,
   type UserSettings,
 } from './types'

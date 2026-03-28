@@ -14,7 +14,7 @@ const Header: Component<HeaderProps> = (props) => {
     <header class={s.header}>
       <div class={s.headerLeft}>
         <Show when={props.showBack}>
-          <button class={s.backButton} onClick={props.onBack} aria-label="Go back">
+          <button class={s.backButton} onClick={() => props.onBack()} aria-label="Go back">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path
                 d="M10 12L6 8L10 4"
@@ -29,7 +29,7 @@ const Header: Component<HeaderProps> = (props) => {
         <span class={s.title}>{props.title}</span>
       </div>
       <Show when={props.showSettings}>
-        <button class={s.settingsButton} onClick={props.onSettings} aria-label="Settings">
+        <button class={s.settingsButton} onClick={() => props.onSettings()} aria-label="Settings">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path
               d="M8 10C9.10457 10 10 9.10457 10 8C10 6.89543 9.10457 6 8 6C6.89543 6 6 6.89543 6 8C6 9.10457 6.89543 10 8 10Z"
