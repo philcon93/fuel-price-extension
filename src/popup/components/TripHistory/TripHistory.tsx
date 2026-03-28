@@ -75,9 +75,7 @@ export const TripHistory: Component = () => {
   }
 
   const fuelVariantKey = (fuelType: string): keyof typeof s.fuelChipVariant =>
-    fuelType in s.fuelChipVariant
-      ? (fuelType as keyof typeof s.fuelChipVariant)
-      : 'petrol'
+    fuelType in s.fuelChipVariant ? (fuelType as keyof typeof s.fuelChipVariant) : 'petrol'
 
   return (
     <Show when={!loading()} fallback={<div class={s.container}>Loading...</div>}>
@@ -107,9 +105,7 @@ export const TripHistory: Component = () => {
                 {stats().totalDistanceKm < 1
                   ? `${Math.round(stats().totalDistanceKm * 1000)}`
                   : stats().totalDistanceKm.toFixed(1)}
-                <span class={s.statUnit}>
-                  {stats().totalDistanceKm < 1 ? 'm' : 'km'}
-                </span>
+                <span class={s.statUnit}>{stats().totalDistanceKm < 1 ? 'm' : 'km'}</span>
               </span>
             </div>
           </div>
@@ -120,9 +116,7 @@ export const TripHistory: Component = () => {
               <p class={s.sectionSubtitle}>Your kinetic footprint</p>
             </div>
             <button class={s.clearButton} onClick={handleClear}>
-              <span class={`material-symbols-outlined ${s.iconSm}`}>
-                delete_sweep
-              </span>
+              <span class={`material-symbols-outlined ${s.iconSm}`}>delete_sweep</span>
               Clear History
             </button>
           </div>
@@ -136,7 +130,9 @@ export const TripHistory: Component = () => {
                     <div class={s.tripCardTop}>
                       <div class={s.tripCardLeft}>
                         <div class={`${s.tripIcon} ${s.tripIconVariant[variant]}`}>
-                          <span class={`material-symbols-outlined ${s.tripIconTextVariant[variant]}`}>
+                          <span
+                            class={`material-symbols-outlined ${s.tripIconTextVariant[variant]}`}
+                          >
                             {fuelIcon(trip.fuelType)}
                           </span>
                         </div>
@@ -151,9 +147,7 @@ export const TripHistory: Component = () => {
                     </div>
                     <div class={s.tripCardBottom}>
                       <span class={s.tripMeta}>
-                        <span class={`material-symbols-outlined ${s.iconSm}`}>
-                          route
-                        </span>
+                        <span class={`material-symbols-outlined ${s.iconSm}`}>route</span>
                         {formatDistance(trip.distanceKm)}
                       </span>
                       <span class={`${s.fuelChip} ${s.fuelChipVariant[variant]}`}>

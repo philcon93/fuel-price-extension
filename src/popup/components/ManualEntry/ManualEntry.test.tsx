@@ -47,12 +47,16 @@ describe('ManualEntry', () => {
   })
 
   it('shows "Save Changes" button for existing cars', () => {
-    render(withQueryProvider(() => <ManualEntry existingCar={createExistingCar()} onSave={() => {}} />))
+    render(
+      withQueryProvider(() => <ManualEntry existingCar={createExistingCar()} onSave={() => {}} />),
+    )
     expect(screen.getByText('Save Changes')).toBeInTheDocument()
   })
 
   it('populates form with existing car data', () => {
-    render(withQueryProvider(() => <ManualEntry existingCar={createExistingCar()} onSave={() => {}} />))
+    render(
+      withQueryProvider(() => <ManualEntry existingCar={createExistingCar()} onSave={() => {}} />),
+    )
 
     const nicknameInput = screen.getByLabelText('Nickname') as HTMLInputElement
     expect(nicknameInput.value).toBe('My Corolla')
@@ -115,7 +119,9 @@ describe('ManualEntry', () => {
     const onSave = vi.fn()
     mockUpdateCar.mockResolvedValue(undefined)
 
-    render(withQueryProvider(() => <ManualEntry existingCar={createExistingCar()} onSave={onSave} />))
+    render(
+      withQueryProvider(() => <ManualEntry existingCar={createExistingCar()} onSave={onSave} />),
+    )
 
     fireEvent.input(screen.getByLabelText('Nickname'), { target: { value: 'Updated Name' } })
 

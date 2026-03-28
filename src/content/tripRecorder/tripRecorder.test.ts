@@ -115,9 +115,7 @@ describe('recordTripToStorage', () => {
       fuelType: 'petrol' as const,
       currency: 'AUD' as const,
     }))
-    chrome.storage.local.get = vi
-      .fn()
-      .mockResolvedValue({ fuelCostTrips: { trips: existing } })
+    chrome.storage.local.get = vi.fn().mockResolvedValue({ fuelCostTrips: { trips: existing } })
     chrome.storage.local.set = vi.fn().mockResolvedValue(undefined)
 
     await recordTripToStorage(makeTripData({ distanceKm: 999 }))

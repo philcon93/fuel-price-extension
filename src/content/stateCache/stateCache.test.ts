@@ -44,9 +44,7 @@ describe('stateCache', () => {
   })
 
   it('fetches state from chrome.storage.sync', async () => {
-    chrome.storage.sync.get = vi
-      .fn()
-      .mockResolvedValue({ fuelCostAppState: mockState })
+    chrome.storage.sync.get = vi.fn().mockResolvedValue({ fuelCostAppState: mockState })
 
     const state = await getState()
 
@@ -55,9 +53,7 @@ describe('stateCache', () => {
   })
 
   it('returns cached state on subsequent calls', async () => {
-    chrome.storage.sync.get = vi
-      .fn()
-      .mockResolvedValue({ fuelCostAppState: mockState })
+    chrome.storage.sync.get = vi.fn().mockResolvedValue({ fuelCostAppState: mockState })
 
     await getState()
     await getState()
@@ -66,9 +62,7 @@ describe('stateCache', () => {
   })
 
   it('invalidates cache after TTL', async () => {
-    chrome.storage.sync.get = vi
-      .fn()
-      .mockResolvedValue({ fuelCostAppState: mockState })
+    chrome.storage.sync.get = vi.fn().mockResolvedValue({ fuelCostAppState: mockState })
 
     await getState()
     vi.advanceTimersByTime(11_000)
@@ -78,9 +72,7 @@ describe('stateCache', () => {
   })
 
   it('clearStateCache forces a fresh fetch', async () => {
-    chrome.storage.sync.get = vi
-      .fn()
-      .mockResolvedValue({ fuelCostAppState: mockState })
+    chrome.storage.sync.get = vi.fn().mockResolvedValue({ fuelCostAppState: mockState })
 
     await getState()
     clearStateCache()

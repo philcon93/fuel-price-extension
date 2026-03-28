@@ -195,15 +195,11 @@ describe('getTrims', () => {
   })
 
   it('fetches without year when not provided', async () => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
-      new Response(JSON.stringify({ Trims: [] })),
-    )
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(JSON.stringify({ Trims: [] })))
 
     await getTrims('Toyota', 'Corolla')
 
-    expect(globalThis.fetch).toHaveBeenCalledWith(
-      expect.not.stringContaining('year='),
-    )
+    expect(globalThis.fetch).toHaveBeenCalledWith(expect.not.stringContaining('year='))
   })
 
   it('returns empty array when no trims found', async () => {

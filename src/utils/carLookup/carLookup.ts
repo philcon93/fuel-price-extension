@@ -79,7 +79,11 @@ export async function searchCars(query: string): Promise<CarResult[]> {
   return results.slice(0, 20)
 }
 
-export async function getTrims(make: string, model: string, year?: number): Promise<CarQueryTrim[]> {
+export async function getTrims(
+  make: string,
+  model: string,
+  year?: number,
+): Promise<CarQueryTrim[]> {
   let params = `cmd=getTrims&make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}`
   if (year) params += `&year=${year}`
 

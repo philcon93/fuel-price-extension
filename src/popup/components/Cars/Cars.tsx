@@ -56,9 +56,7 @@ export const Cars: Component<CarsProps> = (props) => {
   }
 
   const fuelVariantKey = (fuelType: string): keyof typeof s.fuelChipVariant =>
-    fuelType in s.fuelChipVariant
-      ? (fuelType as keyof typeof s.fuelChipVariant)
-      : 'petrol'
+    fuelType in s.fuelChipVariant ? (fuelType as keyof typeof s.fuelChipVariant) : 'petrol'
 
   const handleSetActive = async (carId: string) => {
     await setActiveCarId(carId)
@@ -82,7 +80,7 @@ export const Cars: Component<CarsProps> = (props) => {
         <div class={s.container}>
           <div>
             <div class={s.pageTitle}>Your Garage</div>
-            <div class={s.pageSubtitle}>Manage your kinetic fleet</div>
+            <div class={s.pageSubtitle}>Manage your fleet</div>
           </div>
 
           <Show when={activeCar()}>
@@ -105,9 +103,7 @@ export const Cars: Component<CarsProps> = (props) => {
                     <div class={s.statsGrid}>
                       <div class={s.statBox}>
                         <div class={s.statBoxLabel}>Efficiency</div>
-                        <div class={s.statBoxValue}>
-                          {formatEfficiency(car()) ?? 'N/A'}
-                        </div>
+                        <div class={s.statBoxValue}>{formatEfficiency(car()) ?? 'N/A'}</div>
                       </div>
                       <div class={s.statBox}>
                         <div class={s.statBoxLabel}>Fuel Type</div>
@@ -117,9 +113,7 @@ export const Cars: Component<CarsProps> = (props) => {
 
                     <Show when={!car().isLocked}>
                       <button class={s.editButton} onClick={() => props.onEditCar(car().id)}>
-                        <span class={`material-symbols-outlined ${s.iconSm}`}>
-                          edit
-                        </span>
+                        <span class={`material-symbols-outlined ${s.iconSm}`}>edit</span>
                         Edit Configuration
                       </button>
                     </Show>

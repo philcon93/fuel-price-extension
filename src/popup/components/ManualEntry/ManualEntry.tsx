@@ -152,9 +152,7 @@ export const ManualEntry: Component<ManualEntryProps> = (props) => {
       )}
 
       <button class={s.saveButton} onClick={handleSave} disabled={!isValid()}>
-        <span class={`material-symbols-outlined ${s.iconMd}`}>
-          check_circle
-        </span>
+        <span class={`material-symbols-outlined ${s.iconMd}`}>check_circle</span>
         {car() ? 'Save Changes' : 'Save Car'}
       </button>
     </div>

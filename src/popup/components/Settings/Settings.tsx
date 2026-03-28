@@ -2,12 +2,7 @@ import { createSignal, Show, type Component } from 'solid-js'
 import { createQuery, useQueryClient } from '@tanstack/solid-query'
 import * as s from './Settings.css'
 import { getAppState, updateSettings, updateFuelPrices } from '@utils/storage'
-import {
-  AVERAGE_CAR_ID,
-  type Currency,
-  type DistanceUnit,
-  type EfficiencyUnit,
-} from '@utils/types'
+import { AVERAGE_CAR_ID, type Currency, type DistanceUnit, type EfficiencyUnit } from '@utils/types'
 import { fetchFuelPrices } from '@utils/fuelPrices'
 import { AnalyticsEvents, isOptedOut, setOptOut } from '@utils/analytics'
 
@@ -118,9 +113,7 @@ export const Settings: Component<SettingsProps> = () => {
           <div class={s.unitsGrid}>
             <div class={s.unitCard}>
               <div class={s.unitCardHeader}>
-                <span class={`material-symbols-outlined ${s.iconColorPrimary}`}>
-                  distance
-                </span>
+                <span class={`material-symbols-outlined ${s.iconColorPrimary}`}>distance</span>
                 <span class={s.unitCardTitle}>Distance</span>
               </div>
               <div class={s.segmentedControl}>
@@ -141,9 +134,7 @@ export const Settings: Component<SettingsProps> = () => {
 
             <div class={s.unitCard}>
               <div class={s.unitCardHeader}>
-                <span class={`material-symbols-outlined ${s.iconColorTertiary}`}>
-                  speed
-                </span>
+                <span class={`material-symbols-outlined ${s.iconColorTertiary}`}>speed</span>
                 <span class={s.unitCardTitle}>Efficiency</span>
               </div>
               <select
@@ -162,9 +153,7 @@ export const Settings: Component<SettingsProps> = () => {
             <div class={s.row}>
               <div class={s.rowInfo}>
                 <div class={`${s.rowIcon} ${s.rowIconBgSecondary}`}>
-                  <span class={`material-symbols-outlined ${s.iconColorSecondary}`}>
-                    payments
-                  </span>
+                  <span class={`material-symbols-outlined ${s.iconColorSecondary}`}>payments</span>
                 </div>
                 <div class={s.rowText}>
                   <span class={s.label}>Currency</span>
@@ -192,9 +181,7 @@ export const Settings: Component<SettingsProps> = () => {
             <div class={s.row}>
               <div class={s.rowInfo}>
                 <div class={`${s.rowIcon} ${s.rowIconBgPrimary}`}>
-                  <span class={`material-symbols-outlined ${s.iconColorPrimary}`}>
-                    monitoring
-                  </span>
+                  <span class={`material-symbols-outlined ${s.iconColorPrimary}`}>monitoring</span>
                 </div>
                 <div class={s.rowText}>
                   <span class={s.label}>Average Comparison</span>
@@ -264,9 +251,7 @@ export const Settings: Component<SettingsProps> = () => {
                     step="0.01"
                     min="0"
                     value={appState().fuelPrices.electricityPerKwh}
-                    onChange={(e) =>
-                      handlePriceChange('electricityPerKwh', e.currentTarget.value)
-                    }
+                    onChange={(e) => handlePriceChange('electricityPerKwh', e.currentTarget.value)}
                   />
                 </div>
               </div>

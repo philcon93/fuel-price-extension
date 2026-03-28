@@ -36,9 +36,7 @@ export const Home: Component = () => {
   }
 
   const chipVariantKey = (fuelType: string): keyof typeof s.chipVariant =>
-    fuelType in s.chipVariant
-      ? (fuelType as keyof typeof s.chipVariant)
-      : 'petrol'
+    fuelType in s.chipVariant ? (fuelType as keyof typeof s.chipVariant) : 'petrol'
 
   const formatPrice = (price: number, currency: string): string => {
     return formatCost(price, currency as AppState['settings']['currency'])
@@ -103,9 +101,7 @@ export const Home: Component = () => {
             <div class={s.pricesHeader}>
               <h3 class={s.pricesTitle}>Local Fuel Rates</h3>
               <span class={s.pricesLocation}>
-                <span class={`material-symbols-outlined ${s.iconSm}`}>
-                  location_on
-                </span>
+                <span class={`material-symbols-outlined ${s.iconSm}`}>location_on</span>
                 {appState().fuelPrices.source}
               </span>
             </div>

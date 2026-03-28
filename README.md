@@ -2,7 +2,7 @@
 
 A Chrome extension that shows how much your journey will cost in fuel, right inside Google Maps. No tab switching, no manual calculations. Pick your car, see the cost.
 
-![Fuel cost injected into Google Maps directions](public/showcase.png)
+![Fuel cost injected into Google Maps directions](public/maps.png)
 
 ## What it does
 
@@ -12,11 +12,13 @@ When you plan a route on Google Maps, this extension reads the distance and calc
 
 - **Car lookup by name** — type "Corolla 2023 hybrid" and the extension finds the engine specs for you
 - **Global coverage** — currency and fuel prices auto-detected for your region
-- **Multiple car profiles** — save up to 2 cars (free tier) and switch between them
+- **Fleet management** — save up to 2 cars (free tier), switch between them from the dedicated Cars page, and always fall back to the built-in Average Car
 - **Average car comparison** — see how your car stacks up against the fleet average
 - **No manual fuel price entry** — per-country averages built in, refreshed daily
 - **Trip history** — every calculated fuel cost is recorded locally so you can review past trips, total spend, and distance
 - **Privacy-respecting analytics** — optional anonymous usage analytics via PostHog with a one-click opt-out in Settings
+
+![Extension popup showing the dashboard](public/app-dashboard.png)
 
 ## For end users
 
@@ -28,22 +30,23 @@ When you plan a route on Google Maps, this extension reads the distance and calc
 4. Enable **Developer Mode** (top right)
 5. Click **Load Unpacked** and select the `dist/` folder
 
-The extension icon appears in your toolbar. Click it to set up your car, then navigate to Google Maps and plan a route — the fuel cost appears automatically.
+The extension icon appears in your toolbar. Click it to set up your car, then navigate to Google Maps and plan a route — the fuel cost appears automatically. The popup uses a top navigation bar with four tabs: Dashboard, Cars, History, and Settings.
 
 ### First run
 
 The extension works immediately with an "Average Car" profile based on your region's fleet average. To get accurate costs, click the extension icon and add your own car:
 
-1. Click **+ Add a car**
-2. Type your car's name (e.g. "Ford Ranger 2022 diesel")
-3. Pick the matching trim from the results
-4. Your car is now active — fuel costs on Google Maps will use its efficiency
+1. Open the **Cars** tab
+2. Click **Register New Vehicle**
+3. Type your car's name (e.g. "Ford Ranger 2022 diesel")
+4. Pick the matching trim from the results
+5. Your car is now active — fuel costs on Google Maps will use its efficiency
 
-You can also enter specs manually if your car isn't in the database. The lookup database (CarQuery) covers models up to 2022 — for newer cars, use manual entry.
+You can also enter specs manually if your car isn't in the database. The lookup database (CarQuery) covers models up to 2022 — for newer cars, use manual entry. To switch cars, go to the Cars tab and tap the check icon on any stored vehicle — including the built-in Average Car.
 
 ### Trip history
 
-Every fuel cost the extension calculates is stored locally in your browser. Open the popup and click **Trip history** to see:
+Every fuel cost the extension calculates is stored locally in your browser. Open the **History** tab to see:
 
 - Total trips, distance, and cost
 - A list of recent calculations with car name, distance, and cost
@@ -117,9 +120,9 @@ Without a PostHog key, all analytics calls are no-ops. Users can also disable an
 | Styling            | Vanilla Extract (popup), plain CSS in Shadow DOM (content script) |
 | Language           | TypeScript                                                        |
 | Extension standard | Chrome Manifest V3                                                |
-| Data fetching      | @tanstack/solid-query                                            |
+| Data fetching      | @tanstack/solid-query                                             |
 | Testing            | Vitest + @solidjs/testing-library + @testing-library/jest-dom     |
-| Local storage      | chrome.storage.sync (state), chrome.storage.local (trips, cache) |
+| Local storage      | chrome.storage.sync (state), chrome.storage.local (trips, cache)  |
 | Analytics          | PostHog (optional, with user opt-out)                             |
 | Linting            | ESLint with typescript-eslint + eslint-plugin-solid               |
 | Formatting         | Prettier                                                          |
@@ -130,9 +133,10 @@ Without a PostHog key, all analytics calls are no-ops. Users can also disable an
 src/
   popup/                  # Extension popup UI (SolidJS)
     components/           # Each component in its own directory
-      Header/
-      Home/
-      CarSearch/
+      NavBar/             # Top navigation (Dashboard, Cars, History, Settings)
+      Home/               # Dashboard with active car stats and fuel prices
+      Cars/               # Fleet management (active car, stored vehicles)
+      CarSearch/           # Car lookup and add/edit flow
       TrimPicker/
       ManualEntry/
       Settings/

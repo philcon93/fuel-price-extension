@@ -165,13 +165,7 @@ describe('TrimPicker', () => {
 
     render(
       withQueryProvider(() => (
-        <TrimPicker
-          make="Toyota"
-          model="Corolla"
-          year={2020}
-          onSelect={() => {}}
-          onBack={onBack}
-        />
+        <TrimPicker make="Toyota" model="Corolla" year={2020} onSelect={() => {}} onBack={onBack} />
       )),
     )
 

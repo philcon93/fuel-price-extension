@@ -104,9 +104,7 @@ export const CarSearch: Component<CarSearchProps> = (props) => {
     <div class={s.container}>
       <div class={s.pageHeader}>
         <div class={s.breadcrumb}>
-          <span class={`material-symbols-outlined ${s.iconSm}`}>
-            directions_car
-          </span>
+          <span class={`material-symbols-outlined ${s.iconSm}`}>directions_car</span>
           <span class={s.breadcrumbText}>Vehicle Management</span>
         </div>
         <h1 class={s.pageTitle}>
@@ -180,9 +178,7 @@ export const CarSearch: Component<CarSearchProps> = (props) => {
         <ManualEntry existingCar={editCar() ?? undefined} onSave={props.onDone} />
         <Show when={props.editCarId}>
           <button class={s.deleteButton} onClick={handleDelete}>
-            <span class={`material-symbols-outlined ${s.iconMd}`}>
-              delete
-            </span>
+            <span class={`material-symbols-outlined ${s.iconMd}`}>delete</span>
             Delete this car
           </button>
         </Show>
