@@ -9,6 +9,7 @@ import {
   type EfficiencyUnit,
 } from '@utils/types'
 import { fetchFuelPrices } from '@utils/fuelPrices'
+import { AnalyticsEvents, isOptedOut, setOptOut } from '@utils/analytics'
 
 interface SettingsProps {
   onBack: () => void
@@ -17,9 +18,11 @@ interface SettingsProps {
 export const Settings: Component<SettingsProps> = () => {
   const [state, setState] = createSignal<AppState | null>(null)
   const [refreshing, setRefreshing] = createSignal(false)
+  const [analyticsOptOut, setAnalyticsOptOut] = createSignal(false)
 
   onMount(async () => {
     setState(await getAppState())
+    setAnalyticsOptOut(await isOptedOut())
   })
 
   const isAverageActive = () => state()?.activeCarId === AVERAGE_CAR_ID
@@ -27,16 +30,19 @@ export const Settings: Component<SettingsProps> = () => {
   const handleDistanceUnit = async (unit: DistanceUnit) => {
     await updateSettings({ distanceUnit: unit })
     setState(await getAppState())
+    AnalyticsEvents.settingsChanged('distanceUnit', unit)
   }
 
   const handleEfficiencyUnit = async (unit: EfficiencyUnit) => {
     await updateSettings({ efficiencyUnit: unit })
     setState(await getAppState())
+    AnalyticsEvents.settingsChanged('efficiencyUnit', unit)
   }
 
   const handleCurrency = async (currency: Currency) => {
     await updateSettings({ currency })
     setState(await getAppState())
+    AnalyticsEvents.settingsChanged('currency', currency)
   }
 
   const handleToggleComparison = async () => {
@@ -44,6 +50,13 @@ export const Settings: Component<SettingsProps> = () => {
     const current = state()?.settings.showAverageComparison ?? true
     await updateSettings({ showAverageComparison: !current })
     setState(await getAppState())
+    AnalyticsEvents.settingsChanged('showAverageComparison', String(!current))
+  }
+
+  const handleAnalyticsToggle = async () => {
+    const newValue = !analyticsOptOut()
+    setAnalyticsOptOut(newValue)
+    await setOptOut(newValue)
   }
 
   const handleRefreshPrices = async () => {
@@ -203,6 +216,24 @@ export const Settings: Component<SettingsProps> = () => {
                 {refreshing() ? 'Refreshing...' : 'Refresh'}
               </button>
             </div>
+          </div>
+
+          <div class={s.section}>
+            <span class={s.sectionTitle}>Privacy</span>
+            <div class={s.row}>
+              <span class={s.label}>Disable anonymous analytics</span>
+              <button
+                class={`${s.toggle} ${analyticsOptOut() ? s.toggleActive : ''}`}
+                onClick={handleAnalyticsToggle}
+                aria-label="Toggle analytics opt-out"
+              >
+                <div class={`${s.toggleKnob} ${analyticsOptOut() ? s.toggleKnobActive : ''}`} />
+              </button>
+            </div>
+            <span class={s.hint}>
+              We collect anonymous usage data to improve the extension. No personal data or
+              locations are ever sent.
+            </span>
           </div>
         </div>
       )}

@@ -5,6 +5,7 @@ import { addCar, getAppState, removeCar } from '@utils/storage'
 import { ManualEntry } from '@components/ManualEntry'
 import { TrimPicker } from '@components/TrimPicker'
 import type { CarProfile, CarQueryTrim } from '@utils/types'
+import { AnalyticsEvents } from '@utils/analytics'
 
 interface CarSearchProps {
   editCarId?: string
@@ -45,6 +46,7 @@ export const CarSearch: Component<CarSearchProps> = (props) => {
       try {
         const r = await searchCars(value)
         setResults(r)
+        AnalyticsEvents.carSearchPerformed(value.length, r.length)
       } catch {
         setResults([])
       } finally {
@@ -76,6 +78,8 @@ export const CarSearch: Component<CarSearchProps> = (props) => {
       isManual: false,
     }
     await addCar(profile)
+    AnalyticsEvents.trimSelected(profile.fuelType)
+    AnalyticsEvents.carAdded('lookup', profile.fuelType)
     props.onDone()
   }
 
