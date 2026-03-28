@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { parseQuery, searchCars, getTrims } from './carLookup'
-import { getChromeMock } from '../../test-setup'
 
 beforeEach(() => {
   vi.clearAllMocks()
+  vi.restoreAllMocks()
 })
 
 describe('parseQuery', () => {
@@ -68,21 +68,21 @@ describe('searchCars', () => {
     expect(results).toEqual([])
   })
 
-  it('sends message to background and returns model list', async () => {
-    const mock = getChromeMock()
-    mock.runtime.sendMessage.mockResolvedValueOnce({
-      Models: [
-        { model_name: 'Corolla', model_make_id: 'Toyota' },
-        { model_name: 'Camry', model_make_id: 'Toyota' },
-      ],
-    })
+  it('fetches models and returns car results', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          Models: [
+            { model_name: 'Corolla', model_make_id: 'Toyota' },
+            { model_name: 'Camry', model_make_id: 'Toyota' },
+          ],
+        }),
+      ),
+    )
 
     const results = await searchCars('toyota')
 
-    expect(mock.runtime.sendMessage).toHaveBeenCalledWith({
-      type: 'CAR_QUERY_FETCH',
-      url: expect.stringContaining('cmd=getModels&make=toyota'),
-    })
+    expect(fetchSpy).toHaveBeenCalledWith(expect.stringContaining('cmd=getModels&make=toyota'))
 
     expect(results).toHaveLength(2)
     expect(results[0]).toEqual({
@@ -98,81 +98,83 @@ describe('searchCars', () => {
   })
 
   it('includes year in results when parsed from query', async () => {
-    const mock = getChromeMock()
-    mock.runtime.sendMessage.mockResolvedValueOnce({
-      Models: [{ model_name: 'Corolla', model_make_id: 'Toyota' }],
-    })
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          Models: [{ model_name: 'Corolla', model_make_id: 'Toyota' }],
+        }),
+      ),
+    )
 
     const results = await searchCars('toyota corolla 2020')
 
-    expect(mock.runtime.sendMessage).toHaveBeenCalledWith({
-      type: 'CAR_QUERY_FETCH',
-      url: expect.stringContaining('year=2020'),
-    })
-
+    expect(globalThis.fetch).toHaveBeenCalledWith(expect.stringContaining('year=2020'))
     expect(results).toHaveLength(1)
     expect(results[0].modelYear).toBe(2020)
   })
 
   it('returns empty when API returns no Models', async () => {
-    const mock = getChromeMock()
-    mock.runtime.sendMessage.mockResolvedValueOnce({})
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(JSON.stringify({})))
 
     const results = await searchCars('toyota')
     expect(results).toEqual([])
   })
 
   it('filters by model name', async () => {
-    const mock = getChromeMock()
-    mock.runtime.sendMessage.mockResolvedValueOnce({
-      Models: [
-        { model_name: 'Corolla', model_make_id: 'Toyota' },
-        { model_name: 'Camry', model_make_id: 'Toyota' },
-      ],
-    })
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          Models: [
+            { model_name: 'Corolla', model_make_id: 'Toyota' },
+            { model_name: 'Camry', model_make_id: 'Toyota' },
+          ],
+        }),
+      ),
+    )
 
     const results = await searchCars('toyota corolla')
     expect(results).toHaveLength(1)
     expect(results[0].modelName).toBe('Corolla')
   })
 
-  it('throws when sendMessage returns null', async () => {
-    const mock = getChromeMock()
-    mock.runtime.sendMessage.mockResolvedValueOnce(null)
+  it('throws when API returns non-OK status', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response('Forbidden', { status: 403 }))
 
-    await expect(searchCars('toyota')).rejects.toThrow('Car query fetch failed')
+    await expect(searchCars('toyota')).rejects.toThrow('CarQuery API returned 403')
   })
 })
 
 describe('getTrims', () => {
-  it('sends message and maps trim data', async () => {
-    const mock = getChromeMock()
-    mock.runtime.sendMessage.mockResolvedValueOnce({
-      Trims: [
-        {
-          model_id: '123',
-          model_make_display: 'Toyota',
-          model_name: 'Corolla',
-          model_year: '2020',
-          model_trim: 'LE',
-          model_engine_cc: '1800',
-          model_engine_fuel: 'Gasoline',
-          model_lkm_hwy: '6.5',
-          model_lkm_city: '8.5',
-          model_lkm_mixed: '7.5',
-          model_body: 'Sedan',
-          model_drive: 'Front',
-          model_transmission_type: 'Automatic',
-        },
-      ],
-    })
+  it('fetches and maps trim data', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          Trims: [
+            {
+              model_id: '123',
+              model_make_display: 'Toyota',
+              model_name: 'Corolla',
+              model_year: '2020',
+              model_trim: 'LE',
+              model_engine_cc: '1800',
+              model_engine_fuel: 'Gasoline',
+              model_lkm_hwy: '6.5',
+              model_lkm_city: '8.5',
+              model_lkm_mixed: '7.5',
+              model_body: 'Sedan',
+              model_drive: 'Front',
+              model_transmission_type: 'Automatic',
+            },
+          ],
+        }),
+      ),
+    )
 
     const trims = await getTrims('Toyota', 'Corolla', 2020)
 
-    expect(mock.runtime.sendMessage).toHaveBeenCalledWith({
-      type: 'CAR_QUERY_FETCH',
-      url: expect.stringContaining('cmd=getTrims&make=Toyota&model=Corolla&year=2020'),
-    })
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('cmd=getTrims&make=Toyota&model=Corolla&year=2020'),
+    )
 
     expect(trims).toHaveLength(1)
     expect(trims[0]).toEqual({
@@ -193,20 +195,19 @@ describe('getTrims', () => {
   })
 
   it('fetches without year when not provided', async () => {
-    const mock = getChromeMock()
-    mock.runtime.sendMessage.mockResolvedValueOnce({ Trims: [] })
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+      new Response(JSON.stringify({ Trims: [] })),
+    )
 
     await getTrims('Toyota', 'Corolla')
 
-    expect(mock.runtime.sendMessage).toHaveBeenCalledWith({
-      type: 'CAR_QUERY_FETCH',
-      url: expect.not.stringContaining('year='),
-    })
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      expect.not.stringContaining('year='),
+    )
   })
 
   it('returns empty array when no trims found', async () => {
-    const mock = getChromeMock()
-    mock.runtime.sendMessage.mockResolvedValueOnce({})
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(JSON.stringify({})))
 
     const trims = await getTrims('Toyota', 'Corolla', 2020)
     expect(trims).toEqual([])

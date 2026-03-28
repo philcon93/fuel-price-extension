@@ -44,12 +44,9 @@ export function parseQuery(input: string): ParsedQuery {
 }
 
 async function fetchCarQuery(params: string): Promise<unknown> {
-  const response = await chrome.runtime.sendMessage({
-    type: 'CAR_QUERY_FETCH',
-    url: `${API_BASE}?${params}`,
-  })
-  if (!response) throw new Error('Car query fetch failed')
-  return response
+  const res = await fetch(`${API_BASE}?${params}`)
+  if (!res.ok) throw new Error(`CarQuery API returned ${res.status}`)
+  return res.json()
 }
 
 export async function searchCars(query: string): Promise<CarResult[]> {

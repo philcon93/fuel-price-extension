@@ -57,9 +57,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
 
   if (message.type === 'CAR_QUERY_FETCH') {
-    fetch(message.url, {
-      headers: { 'User-Agent': 'FuelCostExtension/1.0' },
-    })
+    fetch(message.url)
       .then((res) => res.json())
       .then(sendResponse)
       .catch(() => sendResponse(null))

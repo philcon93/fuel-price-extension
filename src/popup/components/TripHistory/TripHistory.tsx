@@ -4,26 +4,19 @@ import * as s from './TripHistory.css'
 import type { TripRecord } from '@utils/types'
 import { formatCost } from '@utils/calculator'
 import type { Currency } from '@utils/types'
+import { getRecentTrips, getTripStats, clearTripHistory } from '@utils/tripHistory'
 
 export const TripHistory: Component = () => {
   const queryClient = useQueryClient()
 
   const tripsQuery = createQuery(() => ({
     queryKey: ['tripHistory'] as const,
-    queryFn: () =>
-      chrome.runtime.sendMessage({ type: 'GET_TRIP_HISTORY', limit: 50 }) as Promise<
-        TripRecord[]
-      >,
+    queryFn: () => getRecentTrips(50),
   }))
 
   const statsQuery = createQuery(() => ({
     queryKey: ['tripStats'] as const,
-    queryFn: () =>
-      chrome.runtime.sendMessage({ type: 'GET_TRIP_STATS' }) as Promise<{
-        totalTrips: number
-        totalCost: number
-        totalDistanceKm: number
-      }>,
+    queryFn: getTripStats,
   }))
 
   const trips = () => tripsQuery.data ?? []
@@ -32,7 +25,7 @@ export const TripHistory: Component = () => {
 
   const handleClear = async () => {
     if (!confirm('Clear all trip history?')) return
-    await chrome.runtime.sendMessage({ type: 'CLEAR_TRIP_HISTORY' })
+    await clearTripHistory()
     await queryClient.invalidateQueries({ queryKey: ['tripHistory'] })
     await queryClient.invalidateQueries({ queryKey: ['tripStats'] })
   }
@@ -94,7 +87,7 @@ export const TripHistory: Component = () => {
 
           <div class={s.tripList}>
             <For each={trips()}>
-              {(trip) => (
+              {(trip: TripRecord) => (
                 <div class={s.tripItem}>
                   <div class={s.tripDetails}>
                     <span class={s.tripCar}>{trip.carNickname}</span>
