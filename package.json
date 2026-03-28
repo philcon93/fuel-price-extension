@@ -16,6 +16,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@tanstack/solid-query": "^5.95.2",
     "dexie": "^4.4.1",
     "posthog-js": "^1.364.1",
     "solid-js": "^1.9.12"

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@solidjs/testing-library'
 import { Settings } from './Settings'
+import { withQueryProvider } from '../../../test-setup'
 import type { AppState } from '@utils/types'
 
 const mockGetAppState = vi.fn<() => Promise<AppState>>()
@@ -59,14 +60,14 @@ beforeEach(() => {
 describe('Settings', () => {
   it('shows loading state initially', () => {
     mockGetAppState.mockReturnValue(new Promise(() => {}))
-    render(() => <Settings onBack={() => {}} />)
+    render(withQueryProvider(() => <Settings onBack={() => {}} />))
     expect(screen.getByText('Loading...')).toBeInTheDocument()
   })
 
   it('renders settings sections after loading', async () => {
     mockGetAppState.mockResolvedValue(createMockState())
 
-    render(() => <Settings onBack={() => {}} />)
+    render(withQueryProvider(() => <Settings onBack={() => {}} />))
 
     await waitFor(() => {
       expect(screen.getByText('Units')).toBeInTheDocument()
@@ -78,7 +79,7 @@ describe('Settings', () => {
   it('renders distance unit selector with correct value', async () => {
     mockGetAppState.mockResolvedValue(createMockState())
 
-    render(() => <Settings onBack={() => {}} />)
+    render(withQueryProvider(() => <Settings onBack={() => {}} />))
 
     await waitFor(() => {
       expect(screen.getByText('Distance')).toBeInTheDocument()
@@ -94,7 +95,7 @@ describe('Settings', () => {
     mockGetAppState.mockResolvedValue(state)
     mockUpdateSettings.mockResolvedValue(undefined)
 
-    render(() => <Settings onBack={() => {}} />)
+    render(withQueryProvider(() => <Settings onBack={() => {}} />))
 
     await waitFor(() => {
       expect(screen.getByText('Distance')).toBeInTheDocument()
@@ -110,7 +111,7 @@ describe('Settings', () => {
     mockGetAppState.mockResolvedValue(createMockState())
     mockUpdateSettings.mockResolvedValue(undefined)
 
-    render(() => <Settings onBack={() => {}} />)
+    render(withQueryProvider(() => <Settings onBack={() => {}} />))
 
     await waitFor(() => {
       expect(screen.getByText('Units')).toBeInTheDocument()
@@ -128,7 +129,7 @@ describe('Settings', () => {
   it('disables comparison toggle when average car is active', async () => {
     mockGetAppState.mockResolvedValue(createMockState({ activeCarId: '__average__' }))
 
-    render(() => <Settings onBack={() => {}} />)
+    render(withQueryProvider(() => <Settings onBack={() => {}} />))
 
     await waitFor(() => {
       expect(screen.getByLabelText('Toggle average comparison')).toBeInTheDocument()
@@ -141,7 +142,7 @@ describe('Settings', () => {
   it('shows hint text when average car is active', async () => {
     mockGetAppState.mockResolvedValue(createMockState({ activeCarId: '__average__' }))
 
-    render(() => <Settings onBack={() => {}} />)
+    render(withQueryProvider(() => <Settings onBack={() => {}} />))
 
     await waitFor(() => {
       expect(
@@ -164,7 +165,7 @@ describe('Settings', () => {
     })
     mockGetAppState.mockResolvedValue(state)
 
-    render(() => <Settings onBack={() => {}} />)
+    render(withQueryProvider(() => <Settings onBack={() => {}} />))
 
     await waitFor(() => {
       expect(screen.getByLabelText('Toggle average comparison')).toBeInTheDocument()
@@ -177,7 +178,7 @@ describe('Settings', () => {
   it('renders fuel price inputs', async () => {
     mockGetAppState.mockResolvedValue(createMockState())
 
-    render(() => <Settings onBack={() => {}} />)
+    render(withQueryProvider(() => <Settings onBack={() => {}} />))
 
     await waitFor(() => {
       expect(screen.getByText('Petrol (per L)')).toBeInTheDocument()
@@ -189,7 +190,7 @@ describe('Settings', () => {
   it('shows the Refresh button', async () => {
     mockGetAppState.mockResolvedValue(createMockState())
 
-    render(() => <Settings onBack={() => {}} />)
+    render(withQueryProvider(() => <Settings onBack={() => {}} />))
 
     await waitFor(() => {
       expect(screen.getByText('Refresh')).toBeInTheDocument()
@@ -209,7 +210,7 @@ describe('Settings', () => {
     mockFetchFuelPrices.mockResolvedValue(prices)
     mockUpdateFuelPrices.mockResolvedValue(undefined)
 
-    render(() => <Settings onBack={() => {}} />)
+    render(withQueryProvider(() => <Settings onBack={() => {}} />))
 
     await waitFor(() => {
       expect(screen.getByText('Refresh')).toBeInTheDocument()
@@ -222,7 +223,7 @@ describe('Settings', () => {
   it('shows source info', async () => {
     mockGetAppState.mockResolvedValue(createMockState())
 
-    render(() => <Settings onBack={() => {}} />)
+    render(withQueryProvider(() => <Settings onBack={() => {}} />))
 
     await waitFor(() => {
       expect(screen.getByText(/API/)).toBeInTheDocument()

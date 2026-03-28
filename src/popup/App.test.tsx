@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@solidjs/testing-library'
 import { App } from './App'
+import { withQueryProvider } from '../test-setup'
 import type { AppState } from '@utils/types'
 
 const mockGetAppState = vi.fn<() => Promise<AppState>>()
@@ -79,7 +80,7 @@ beforeEach(() => {
 
 describe('App', () => {
   it('renders with home view by default', async () => {
-    render(() => <App />)
+    render(withQueryProvider(() => <App />))
 
     await waitFor(() => {
       expect(screen.getByText('Fuel Cost')).toBeInTheDocument()
@@ -87,7 +88,7 @@ describe('App', () => {
   })
 
   it('shows settings button on home view', async () => {
-    render(() => <App />)
+    render(withQueryProvider(() => <App />))
 
     await waitFor(() => {
       expect(screen.getByLabelText('Settings')).toBeInTheDocument()
@@ -95,7 +96,7 @@ describe('App', () => {
   })
 
   it('does not show back button on home view', async () => {
-    render(() => <App />)
+    render(withQueryProvider(() => <App />))
 
     await waitFor(() => {
       expect(screen.getByText('Fuel Cost')).toBeInTheDocument()
@@ -104,7 +105,7 @@ describe('App', () => {
   })
 
   it('navigates to settings view', async () => {
-    render(() => <App />)
+    render(withQueryProvider(() => <App />))
 
     await waitFor(() => {
       expect(screen.getByLabelText('Settings')).toBeInTheDocument()
@@ -119,7 +120,7 @@ describe('App', () => {
   })
 
   it('navigates back to home from settings', async () => {
-    render(() => <App />)
+    render(withQueryProvider(() => <App />))
 
     await waitFor(() => {
       expect(screen.getByLabelText('Settings')).toBeInTheDocument()
@@ -139,7 +140,7 @@ describe('App', () => {
   })
 
   it('navigates to add car view', async () => {
-    render(() => <App />)
+    render(withQueryProvider(() => <App />))
 
     await waitFor(() => {
       expect(screen.getByText('Add a car')).toBeInTheDocument()

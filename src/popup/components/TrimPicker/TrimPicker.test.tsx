@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@solidjs/testing-library'
 import { TrimPicker } from './TrimPicker'
+import { withQueryProvider } from '../../../test-setup'
 import type { CarQueryTrim } from '@utils/types'
 
 const mockGetTrims = vi.fn<() => Promise<CarQueryTrim[]>>()
@@ -14,7 +15,7 @@ function createMockTrim(overrides?: Partial<CarQueryTrim>): CarQueryTrim {
     modelId: '123',
     makeDisplay: 'Toyota',
     modelName: 'Corolla',
-    modelYear: 2023,
+    modelYear: 2020,
     modelTrim: 'LE',
     modelEngineCC: 1800,
     modelEngineFuel: 'Gasoline',
@@ -36,9 +37,17 @@ describe('TrimPicker', () => {
   it('shows loading state while fetching trims', () => {
     mockGetTrims.mockReturnValue(new Promise(() => {}))
 
-    render(() => (
-      <TrimPicker make="Toyota" model="Corolla" year={2023} onSelect={() => {}} onBack={() => {}} />
-    ))
+    render(
+      withQueryProvider(() => (
+        <TrimPicker
+          make="Toyota"
+          model="Corolla"
+          year={2020}
+          onSelect={() => {}}
+          onBack={() => {}}
+        />
+      )),
+    )
 
     expect(screen.getByText('Loading trims...')).toBeInTheDocument()
   })
@@ -46,11 +55,19 @@ describe('TrimPicker', () => {
   it('renders the heading with make, model, and year', () => {
     mockGetTrims.mockReturnValue(new Promise(() => {}))
 
-    render(() => (
-      <TrimPicker make="Toyota" model="Corolla" year={2023} onSelect={() => {}} onBack={() => {}} />
-    ))
+    render(
+      withQueryProvider(() => (
+        <TrimPicker
+          make="Toyota"
+          model="Corolla"
+          year={2020}
+          onSelect={() => {}}
+          onBack={() => {}}
+        />
+      )),
+    )
 
-    expect(screen.getByText('Toyota Corolla 2023')).toBeInTheDocument()
+    expect(screen.getByText('Toyota Corolla 2020')).toBeInTheDocument()
   })
 
   it('renders trims after loading', async () => {
@@ -59,34 +76,58 @@ describe('TrimPicker', () => {
       createMockTrim({ modelTrim: 'SE', modelEngineCC: 2000 }),
     ])
 
-    render(() => (
-      <TrimPicker make="Toyota" model="Corolla" year={2023} onSelect={() => {}} onBack={() => {}} />
-    ))
+    render(
+      withQueryProvider(() => (
+        <TrimPicker
+          make="Toyota"
+          model="Corolla"
+          year={2020}
+          onSelect={() => {}}
+          onBack={() => {}}
+        />
+      )),
+    )
 
     await waitFor(() => {
-      expect(screen.getByText('LE')).toBeInTheDocument()
-      expect(screen.getByText('SE')).toBeInTheDocument()
+      expect(screen.getByText(/^LE/)).toBeInTheDocument()
+      expect(screen.getByText(/^SE/)).toBeInTheDocument()
     })
   })
 
   it('shows "Base" for trims without a name', async () => {
     mockGetTrims.mockResolvedValue([createMockTrim({ modelTrim: '' })])
 
-    render(() => (
-      <TrimPicker make="Toyota" model="Corolla" year={2023} onSelect={() => {}} onBack={() => {}} />
-    ))
+    render(
+      withQueryProvider(() => (
+        <TrimPicker
+          make="Toyota"
+          model="Corolla"
+          year={2020}
+          onSelect={() => {}}
+          onBack={() => {}}
+        />
+      )),
+    )
 
     await waitFor(() => {
-      expect(screen.getByText('Base')).toBeInTheDocument()
+      expect(screen.getByText(/^Base/)).toBeInTheDocument()
     })
   })
 
   it('shows "No trims found" when API returns empty', async () => {
     mockGetTrims.mockResolvedValue([])
 
-    render(() => (
-      <TrimPicker make="Toyota" model="Corolla" year={2023} onSelect={() => {}} onBack={() => {}} />
-    ))
+    render(
+      withQueryProvider(() => (
+        <TrimPicker
+          make="Toyota"
+          model="Corolla"
+          year={2020}
+          onSelect={() => {}}
+          onBack={() => {}}
+        />
+      )),
+    )
 
     await waitFor(() => {
       expect(screen.getByText('No trims found')).toBeInTheDocument()
@@ -98,15 +139,23 @@ describe('TrimPicker', () => {
     const trim = createMockTrim({ modelTrim: 'LE' })
     mockGetTrims.mockResolvedValue([trim])
 
-    render(() => (
-      <TrimPicker make="Toyota" model="Corolla" year={2023} onSelect={onSelect} onBack={() => {}} />
-    ))
+    render(
+      withQueryProvider(() => (
+        <TrimPicker
+          make="Toyota"
+          model="Corolla"
+          year={2020}
+          onSelect={onSelect}
+          onBack={() => {}}
+        />
+      )),
+    )
 
     await waitFor(() => {
-      expect(screen.getByText('LE')).toBeInTheDocument()
+      expect(screen.getByText(/^LE/)).toBeInTheDocument()
     })
 
-    fireEvent.click(screen.getByText('LE'))
+    fireEvent.click(screen.getByText(/^LE/))
     expect(onSelect).toHaveBeenCalledWith(trim)
   })
 
@@ -114,9 +163,17 @@ describe('TrimPicker', () => {
     const onBack = vi.fn()
     mockGetTrims.mockReturnValue(new Promise(() => {}))
 
-    render(() => (
-      <TrimPicker make="Toyota" model="Corolla" year={2023} onSelect={() => {}} onBack={onBack} />
-    ))
+    render(
+      withQueryProvider(() => (
+        <TrimPicker
+          make="Toyota"
+          model="Corolla"
+          year={2020}
+          onSelect={() => {}}
+          onBack={onBack}
+        />
+      )),
+    )
 
     fireEvent.click(screen.getByText(/Back to search/))
     expect(onBack).toHaveBeenCalledOnce()
@@ -133,9 +190,17 @@ describe('TrimPicker', () => {
       }),
     ])
 
-    render(() => (
-      <TrimPicker make="Toyota" model="Corolla" year={2023} onSelect={() => {}} onBack={() => {}} />
-    ))
+    render(
+      withQueryProvider(() => (
+        <TrimPicker
+          make="Toyota"
+          model="Corolla"
+          year={2020}
+          onSelect={() => {}}
+          onBack={() => {}}
+        />
+      )),
+    )
 
     await waitFor(() => {
       expect(screen.getByText('1.8L · Gasoline · 7.5 L/100km · Automatic')).toBeInTheDocument()
@@ -145,9 +210,17 @@ describe('TrimPicker', () => {
   it('handles API error gracefully', async () => {
     mockGetTrims.mockRejectedValue(new Error('Network error'))
 
-    render(() => (
-      <TrimPicker make="Toyota" model="Corolla" year={2023} onSelect={() => {}} onBack={() => {}} />
-    ))
+    render(
+      withQueryProvider(() => (
+        <TrimPicker
+          make="Toyota"
+          model="Corolla"
+          year={2020}
+          onSelect={() => {}}
+          onBack={() => {}}
+        />
+      )),
+    )
 
     await waitFor(() => {
       expect(screen.getByText('No trims found')).toBeInTheDocument()

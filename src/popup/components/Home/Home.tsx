@@ -1,4 +1,5 @@
-import { createSignal, onMount, For, Show, type Component } from 'solid-js'
+import { For, Show, type Component } from 'solid-js'
+import { createQuery, useQueryClient } from '@tanstack/solid-query'
 import * as s from './Home.css'
 import { getAppState, setActiveCarId } from '@utils/storage'
 import { MAX_FREE_CARS, type AppState, type CarProfile } from '@utils/types'
@@ -12,12 +13,14 @@ interface HomeProps {
 }
 
 export const Home: Component<HomeProps> = (props) => {
-  const [state, setState] = createSignal<AppState | null>(null)
+  const queryClient = useQueryClient()
 
-  onMount(async () => {
-    const appState = await getAppState()
-    setState(appState)
-  })
+  const stateQuery = createQuery(() => ({
+    queryKey: ['appState'] as const,
+    queryFn: getAppState,
+  }))
+
+  const state = () => stateQuery.data ?? null
 
   const activeCar = (): CarProfile | undefined =>
     state()?.cars.find((c) => c.id === state()?.activeCarId)
@@ -36,8 +39,7 @@ export const Home: Component<HomeProps> = (props) => {
   const handleCarChange = async (e: Event) => {
     const select = e.target as HTMLSelectElement
     await setActiveCarId(select.value)
-    const appState = await getAppState()
-    setState(appState)
+    await queryClient.invalidateQueries({ queryKey: ['appState'] })
   }
 
   const handleAddCar = () => {

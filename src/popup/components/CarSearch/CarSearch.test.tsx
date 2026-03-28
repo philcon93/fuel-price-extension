@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@solidjs/testing-library'
 import { CarSearch } from './CarSearch'
+import { withQueryProvider } from '../../../test-setup'
 import type { AppState } from '@utils/types'
 
 const mockSearchCars = vi.fn()
@@ -60,17 +61,17 @@ beforeEach(() => {
 
 describe('CarSearch', () => {
   it('renders search input when not in edit mode', () => {
-    render(() => <CarSearch onDone={() => {}} />)
+    render(withQueryProvider(() => <CarSearch onDone={() => {}} />))
     expect(screen.getByPlaceholderText(/Search e\.g\./)).toBeInTheDocument()
   })
 
   it('shows "Enter manually" toggle', () => {
-    render(() => <CarSearch onDone={() => {}} />)
+    render(withQueryProvider(() => <CarSearch onDone={() => {}} />))
     expect(screen.getByText('Enter manually')).toBeInTheDocument()
   })
 
   it('toggles to manual entry mode', () => {
-    render(() => <CarSearch onDone={() => {}} />)
+    render(withQueryProvider(() => <CarSearch onDone={() => {}} />))
     fireEvent.click(screen.getByText('Enter manually'))
     expect(screen.getByText('Search instead')).toBeInTheDocument()
   })
@@ -85,7 +86,7 @@ describe('CarSearch', () => {
     })
 
     it('does not search for queries shorter than 2 characters', async () => {
-      render(() => <CarSearch onDone={() => {}} />)
+      render(withQueryProvider(() => <CarSearch onDone={() => {}} />))
       const input = screen.getByPlaceholderText(/Search e\.g\./)
       fireEvent.input(input, { target: { value: 't' } })
 
@@ -95,26 +96,29 @@ describe('CarSearch', () => {
 
     it('searches after debounce delay', async () => {
       mockSearchCars.mockResolvedValue([
-        { makeDisplay: 'Toyota', modelName: 'Corolla', modelYear: 2023, trimCount: 3 },
+        { makeDisplay: 'Toyota', modelName: 'Corolla', modelYear: 2020 },
       ])
 
-      render(() => <CarSearch onDone={() => {}} />)
+      render(withQueryProvider(() => <CarSearch onDone={() => {}} />))
       const input = screen.getByPlaceholderText(/Search e\.g\./)
       fireEvent.input(input, { target: { value: 'toyota' } })
 
       expect(mockSearchCars).not.toHaveBeenCalled()
 
       await vi.advanceTimersByTimeAsync(500)
-      expect(mockSearchCars).toHaveBeenCalledWith('toyota')
+
+      await waitFor(() => {
+        expect(mockSearchCars).toHaveBeenCalledWith('toyota')
+      })
     })
 
     it('displays search results', async () => {
       mockSearchCars.mockResolvedValue([
-        { makeDisplay: 'Toyota', modelName: 'Corolla', modelYear: 2023, trimCount: 3 },
-        { makeDisplay: 'Toyota', modelName: 'Camry', modelYear: 2023, trimCount: 2 },
+        { makeDisplay: 'Toyota', modelName: 'Corolla', modelYear: 2020 },
+        { makeDisplay: 'Toyota', modelName: 'Camry', modelYear: 2020 },
       ])
 
-      render(() => <CarSearch onDone={() => {}} />)
+      render(withQueryProvider(() => <CarSearch onDone={() => {}} />))
       const input = screen.getByPlaceholderText(/Search e\.g\./)
       fireEvent.input(input, { target: { value: 'toyota' } })
       await vi.advanceTimersByTimeAsync(500)
@@ -128,7 +132,7 @@ describe('CarSearch', () => {
     it('shows "No results found" for empty search results', async () => {
       mockSearchCars.mockResolvedValue([])
 
-      render(() => <CarSearch onDone={() => {}} />)
+      render(withQueryProvider(() => <CarSearch onDone={() => {}} />))
       const input = screen.getByPlaceholderText(/Search e\.g\./)
       fireEvent.input(input, { target: { value: 'zzz' } })
       await vi.advanceTimersByTimeAsync(500)
@@ -138,46 +142,18 @@ describe('CarSearch', () => {
       })
     })
 
-    it('shows "Searching..." while loading', async () => {
-      mockSearchCars.mockReturnValue(new Promise(() => {}))
+    it('shows year in result metadata when provided', async () => {
+      mockSearchCars.mockResolvedValue([
+        { makeDisplay: 'Toyota', modelName: 'Corolla', modelYear: 2020 },
+      ])
 
-      render(() => <CarSearch onDone={() => {}} />)
+      render(withQueryProvider(() => <CarSearch onDone={() => {}} />))
       const input = screen.getByPlaceholderText(/Search e\.g\./)
       fireEvent.input(input, { target: { value: 'toyota' } })
       await vi.advanceTimersByTimeAsync(500)
 
       await waitFor(() => {
-        expect(screen.getByText('Searching...')).toBeInTheDocument()
-      })
-    })
-
-    it('shows trim count in result metadata', async () => {
-      mockSearchCars.mockResolvedValue([
-        { makeDisplay: 'Toyota', modelName: 'Corolla', modelYear: 2023, trimCount: 3 },
-      ])
-
-      render(() => <CarSearch onDone={() => {}} />)
-      const input = screen.getByPlaceholderText(/Search e\.g\./)
-      fireEvent.input(input, { target: { value: 'toyota' } })
-      await vi.advanceTimersByTimeAsync(500)
-
-      await waitFor(() => {
-        expect(screen.getByText('2023 · 3 trims')).toBeInTheDocument()
-      })
-    })
-
-    it('handles singular trim count', async () => {
-      mockSearchCars.mockResolvedValue([
-        { makeDisplay: 'Honda', modelName: 'Civic', modelYear: 2024, trimCount: 1 },
-      ])
-
-      render(() => <CarSearch onDone={() => {}} />)
-      const input = screen.getByPlaceholderText(/Search e\.g\./)
-      fireEvent.input(input, { target: { value: 'honda' } })
-      await vi.advanceTimersByTimeAsync(500)
-
-      await waitFor(() => {
-        expect(screen.getByText('2024 · 1 trim')).toBeInTheDocument()
+        expect(screen.getByText('2020')).toBeInTheDocument()
       })
     })
   })
@@ -185,7 +161,7 @@ describe('CarSearch', () => {
   it('shows manual entry and delete in edit mode', async () => {
     mockGetAppState.mockResolvedValue(createMockState())
 
-    render(() => <CarSearch editCarId="car-1" onDone={() => {}} />)
+    render(withQueryProvider(() => <CarSearch editCarId="car-1" onDone={() => {}} />))
 
     await waitFor(() => {
       expect(screen.getByText('Delete this car')).toBeInTheDocument()
@@ -198,7 +174,7 @@ describe('CarSearch', () => {
     mockGetAppState.mockResolvedValue(createMockState())
     mockRemoveCar.mockResolvedValue(undefined)
 
-    render(() => <CarSearch editCarId="car-1" onDone={onDone} />)
+    render(withQueryProvider(() => <CarSearch editCarId="car-1" onDone={onDone} />))
 
     await waitFor(() => {
       expect(screen.getByText('Delete this car')).toBeInTheDocument()
@@ -219,7 +195,7 @@ describe('CarSearch', () => {
     const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false)
     mockGetAppState.mockResolvedValue(createMockState())
 
-    render(() => <CarSearch editCarId="car-1" onDone={() => {}} />)
+    render(withQueryProvider(() => <CarSearch editCarId="car-1" onDone={() => {}} />))
 
     await waitFor(() => {
       expect(screen.getByText('Delete this car')).toBeInTheDocument()

@@ -2,10 +2,28 @@ import 'fake-indexeddb/auto'
 import { vi, afterEach } from 'vitest'
 import { cleanup } from '@solidjs/testing-library'
 import '@testing-library/jest-dom/vitest'
+import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
+import type { JSX } from 'solid-js'
 
 afterEach(() => {
   cleanup()
 })
+
+export function createTestQueryClient() {
+  return new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        staleTime: 0,
+      },
+    },
+  })
+}
+
+export function withQueryProvider(ui: () => JSX.Element): () => JSX.Element {
+  const client = createTestQueryClient()
+  return () => <QueryClientProvider client={client}>{ui()}</QueryClientProvider>
+}
 
 const syncStore: Record<string, unknown> = {}
 const localStore: Record<string, unknown> = {}

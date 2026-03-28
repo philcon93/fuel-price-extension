@@ -1,4 +1,5 @@
 import { createSignal, type Component } from 'solid-js'
+import { useQueryClient } from '@tanstack/solid-query'
 import * as s from './ManualEntry.css'
 import { addCar, updateCar } from '@utils/storage'
 import type { CarProfile, FuelType } from '@utils/types'
@@ -10,6 +11,7 @@ interface ManualEntryProps {
 }
 
 export const ManualEntry: Component<ManualEntryProps> = (props) => {
+  const queryClient = useQueryClient()
   const car = () => props.existingCar
   const [nickname, setNickname] = createSignal(car()?.nickname ?? '')
   const [fuelType, setFuelType] = createSignal<FuelType>(car()?.fuelType ?? 'petrol')
@@ -53,6 +55,7 @@ export const ManualEntry: Component<ManualEntryProps> = (props) => {
       await addCar(profile)
       AnalyticsEvents.carAdded('manual', profile.fuelType)
     }
+    await queryClient.invalidateQueries({ queryKey: ['appState'] })
     props.onSave()
   }
 

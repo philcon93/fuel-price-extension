@@ -1,4 +1,5 @@
 import { render } from 'solid-js/web'
+import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
 import { App } from './App'
 import { initAnalytics, AnalyticsEvents } from '@utils/analytics'
 
@@ -18,9 +19,25 @@ async function processDeferredEvents() {
   }
 }
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30_000,
+      retry: 1,
+    },
+  },
+})
+
 const root = document.getElementById('root')
 if (root) {
-  render(() => <App />, root)
+  render(
+    () => (
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
+    ),
+    root,
+  )
   initAnalytics().then(() => {
     AnalyticsEvents.popupOpened()
     processDeferredEvents()

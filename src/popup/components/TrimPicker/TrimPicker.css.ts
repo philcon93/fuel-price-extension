@@ -58,6 +58,11 @@ export const backLink = style({
   },
 })
 
+export const trimYear = style({
+  fontWeight: 400,
+  color: vars.color.textMuted,
+})
+
 export const loading = style({
   fontSize: vars.font.sm,
   color: vars.color.textMuted,

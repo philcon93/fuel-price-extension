@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@solidjs/testing-library'
 import { Home } from './Home'
+import { withQueryProvider } from '../../../test-setup'
 import type { AppState } from '@utils/types'
 
 const mockGetAppState = vi.fn<() => Promise<AppState>>()
@@ -66,9 +67,11 @@ beforeEach(() => {
 describe('Home', () => {
   it('shows loading state initially', () => {
     mockGetAppState.mockReturnValue(new Promise(() => {}))
-    render(() => (
-      <Home onAddCar={() => {}} onEditCar={() => {}} onSettings={() => {}} onHistory={() => {}} />
-    ))
+    render(
+      withQueryProvider(() => (
+        <Home onAddCar={() => {}} onEditCar={() => {}} onSettings={() => {}} onHistory={() => {}} />
+      )),
+    )
     expect(screen.getByText('Loading...')).toBeInTheDocument()
   })
 
@@ -76,9 +79,11 @@ describe('Home', () => {
     const state = createMockState()
     mockGetAppState.mockResolvedValue(state)
 
-    render(() => (
-      <Home onAddCar={() => {}} onEditCar={() => {}} onSettings={() => {}} onHistory={() => {}} />
-    ))
+    render(
+      withQueryProvider(() => (
+        <Home onAddCar={() => {}} onEditCar={() => {}} onSettings={() => {}} onHistory={() => {}} />
+      )),
+    )
 
     await waitFor(() => {
       expect(screen.getByText('Active car')).toBeInTheDocument()
@@ -91,9 +96,11 @@ describe('Home', () => {
   it('renders all cars in the selector', async () => {
     mockGetAppState.mockResolvedValue(createMockState())
 
-    render(() => (
-      <Home onAddCar={() => {}} onEditCar={() => {}} onSettings={() => {}} onHistory={() => {}} />
-    ))
+    render(
+      withQueryProvider(() => (
+        <Home onAddCar={() => {}} onEditCar={() => {}} onSettings={() => {}} onHistory={() => {}} />
+      )),
+    )
 
     await waitFor(() => {
       expect(screen.getByText('Average Car')).toBeInTheDocument()
@@ -104,9 +111,11 @@ describe('Home', () => {
   it('shows fuel prices', async () => {
     mockGetAppState.mockResolvedValue(createMockState())
 
-    render(() => (
-      <Home onAddCar={() => {}} onEditCar={() => {}} onSettings={() => {}} onHistory={() => {}} />
-    ))
+    render(
+      withQueryProvider(() => (
+        <Home onAddCar={() => {}} onEditCar={() => {}} onSettings={() => {}} onHistory={() => {}} />
+      )),
+    )
 
     await waitFor(() => {
       expect(screen.getByText('Fuel prices')).toBeInTheDocument()
@@ -119,9 +128,11 @@ describe('Home', () => {
   it('shows Edit button for unlocked cars', async () => {
     mockGetAppState.mockResolvedValue(createMockState({ activeCarId: 'car-1' }))
 
-    render(() => (
-      <Home onAddCar={() => {}} onEditCar={() => {}} onSettings={() => {}} onHistory={() => {}} />
-    ))
+    render(
+      withQueryProvider(() => (
+        <Home onAddCar={() => {}} onEditCar={() => {}} onSettings={() => {}} onHistory={() => {}} />
+      )),
+    )
 
     await waitFor(() => {
       expect(screen.getByText('Edit')).toBeInTheDocument()
@@ -131,9 +142,11 @@ describe('Home', () => {
   it('does not show Edit button for locked cars', async () => {
     mockGetAppState.mockResolvedValue(createMockState({ activeCarId: '__average__' }))
 
-    render(() => (
-      <Home onAddCar={() => {}} onEditCar={() => {}} onSettings={() => {}} onHistory={() => {}} />
-    ))
+    render(
+      withQueryProvider(() => (
+        <Home onAddCar={() => {}} onEditCar={() => {}} onSettings={() => {}} onHistory={() => {}} />
+      )),
+    )
 
     await waitFor(() => {
       expect(screen.getByText('Active car')).toBeInTheDocument()
@@ -145,9 +158,16 @@ describe('Home', () => {
     const onEditCar = vi.fn()
     mockGetAppState.mockResolvedValue(createMockState({ activeCarId: 'car-1' }))
 
-    render(() => (
-      <Home onAddCar={() => {}} onEditCar={onEditCar} onSettings={() => {}} onHistory={() => {}} />
-    ))
+    render(
+      withQueryProvider(() => (
+        <Home
+          onAddCar={() => {}}
+          onEditCar={onEditCar}
+          onSettings={() => {}}
+          onHistory={() => {}}
+        />
+      )),
+    )
 
     await waitFor(() => {
       expect(screen.getByText('Edit')).toBeInTheDocument()
@@ -161,9 +181,16 @@ describe('Home', () => {
     const onAddCar = vi.fn()
     mockGetAppState.mockResolvedValue(createMockState())
 
-    render(() => (
-      <Home onAddCar={onAddCar} onEditCar={() => {}} onSettings={() => {}} onHistory={() => {}} />
-    ))
+    render(
+      withQueryProvider(() => (
+        <Home
+          onAddCar={onAddCar}
+          onEditCar={() => {}}
+          onSettings={() => {}}
+          onHistory={() => {}}
+        />
+      )),
+    )
 
     await waitFor(() => {
       expect(screen.getByText('Add a car')).toBeInTheDocument()
@@ -189,9 +216,16 @@ describe('Home', () => {
     })
     mockGetAppState.mockResolvedValue(state)
 
-    render(() => (
-      <Home onAddCar={onAddCar} onEditCar={() => {}} onSettings={() => {}} onHistory={() => {}} />
-    ))
+    render(
+      withQueryProvider(() => (
+        <Home
+          onAddCar={onAddCar}
+          onEditCar={() => {}}
+          onSettings={() => {}}
+          onHistory={() => {}}
+        />
+      )),
+    )
 
     await waitFor(() => {
       expect(screen.getByText('Add a car')).toBeInTheDocument()
@@ -208,9 +242,11 @@ describe('Home', () => {
     mockGetAppState.mockResolvedValue(state)
     mockSetActiveCarId.mockResolvedValue(undefined)
 
-    render(() => (
-      <Home onAddCar={() => {}} onEditCar={() => {}} onSettings={() => {}} onHistory={() => {}} />
-    ))
+    render(
+      withQueryProvider(() => (
+        <Home onAddCar={() => {}} onEditCar={() => {}} onSettings={() => {}} onHistory={() => {}} />
+      )),
+    )
 
     await waitFor(() => {
       expect(screen.getByRole('combobox')).toBeInTheDocument()
@@ -223,9 +259,11 @@ describe('Home', () => {
   it('shows car summary for the active car', async () => {
     mockGetAppState.mockResolvedValue(createMockState({ activeCarId: 'car-1' }))
 
-    render(() => (
-      <Home onAddCar={() => {}} onEditCar={() => {}} onSettings={() => {}} onHistory={() => {}} />
-    ))
+    render(
+      withQueryProvider(() => (
+        <Home onAddCar={() => {}} onEditCar={() => {}} onSettings={() => {}} onHistory={() => {}} />
+      )),
+    )
 
     await waitFor(() => {
       expect(screen.getByText(/Toyota Corolla/)).toBeInTheDocument()
@@ -235,9 +273,11 @@ describe('Home', () => {
   it('shows fleet average text for the default car', async () => {
     mockGetAppState.mockResolvedValue(createMockState({ activeCarId: '__average__' }))
 
-    render(() => (
-      <Home onAddCar={() => {}} onEditCar={() => {}} onSettings={() => {}} onHistory={() => {}} />
-    ))
+    render(
+      withQueryProvider(() => (
+        <Home onAddCar={() => {}} onEditCar={() => {}} onSettings={() => {}} onHistory={() => {}} />
+      )),
+    )
 
     await waitFor(() => {
       expect(screen.getByText('Fleet average for your region')).toBeInTheDocument()

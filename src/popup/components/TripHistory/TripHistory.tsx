@@ -1,34 +1,40 @@
-import { createSignal, onMount, For, Show, type Component } from 'solid-js'
+import { For, Show, type Component } from 'solid-js'
+import { createQuery, useQueryClient } from '@tanstack/solid-query'
 import * as s from './TripHistory.css'
 import type { TripRecord } from '@utils/types'
 import { formatCost } from '@utils/calculator'
 import type { Currency } from '@utils/types'
 
 export const TripHistory: Component = () => {
-  const [trips, setTrips] = createSignal<TripRecord[]>([])
-  const [stats, setStats] = createSignal({ totalTrips: 0, totalCost: 0, totalDistanceKm: 0 })
-  const [loading, setLoading] = createSignal(true)
+  const queryClient = useQueryClient()
 
-  const loadData = async () => {
-    try {
-      const [tripData, statsData] = await Promise.all([
-        chrome.runtime.sendMessage({ type: 'GET_TRIP_HISTORY', limit: 50 }),
-        chrome.runtime.sendMessage({ type: 'GET_TRIP_STATS' }),
-      ])
-      setTrips(tripData ?? [])
-      setStats(statsData ?? { totalTrips: 0, totalCost: 0, totalDistanceKm: 0 })
-    } finally {
-      setLoading(false)
-    }
-  }
+  const tripsQuery = createQuery(() => ({
+    queryKey: ['tripHistory'] as const,
+    queryFn: () =>
+      chrome.runtime.sendMessage({ type: 'GET_TRIP_HISTORY', limit: 50 }) as Promise<
+        TripRecord[]
+      >,
+  }))
 
-  onMount(loadData)
+  const statsQuery = createQuery(() => ({
+    queryKey: ['tripStats'] as const,
+    queryFn: () =>
+      chrome.runtime.sendMessage({ type: 'GET_TRIP_STATS' }) as Promise<{
+        totalTrips: number
+        totalCost: number
+        totalDistanceKm: number
+      }>,
+  }))
+
+  const trips = () => tripsQuery.data ?? []
+  const stats = () => statsQuery.data ?? { totalTrips: 0, totalCost: 0, totalDistanceKm: 0 }
+  const loading = () => tripsQuery.isLoading || statsQuery.isLoading
 
   const handleClear = async () => {
     if (!confirm('Clear all trip history?')) return
     await chrome.runtime.sendMessage({ type: 'CLEAR_TRIP_HISTORY' })
-    setTrips([])
-    setStats({ totalTrips: 0, totalCost: 0, totalDistanceKm: 0 })
+    await queryClient.invalidateQueries({ queryKey: ['tripHistory'] })
+    await queryClient.invalidateQueries({ queryKey: ['tripStats'] })
   }
 
   const formatDate = (ts: number): string => {

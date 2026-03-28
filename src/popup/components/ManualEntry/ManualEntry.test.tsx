@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@solidjs/testing-library'
 import { ManualEntry } from './ManualEntry'
+import { withQueryProvider } from '../../../test-setup'
 import type { CarProfile } from '@utils/types'
 
 const mockAddCar = vi.fn()
@@ -32,7 +33,7 @@ beforeEach(() => {
 
 describe('ManualEntry', () => {
   it('renders form fields for a new car', () => {
-    render(() => <ManualEntry onSave={() => {}} />)
+    render(withQueryProvider(() => <ManualEntry onSave={() => {}} />))
 
     expect(screen.getByLabelText('Nickname')).toBeInTheDocument()
     expect(screen.getByLabelText('Fuel type')).toBeInTheDocument()
@@ -41,30 +42,30 @@ describe('ManualEntry', () => {
   })
 
   it('shows "Save car" button for new cars', () => {
-    render(() => <ManualEntry onSave={() => {}} />)
+    render(withQueryProvider(() => <ManualEntry onSave={() => {}} />))
     expect(screen.getByText('Save car')).toBeInTheDocument()
   })
 
   it('shows "Save changes" button for existing cars', () => {
-    render(() => <ManualEntry existingCar={createExistingCar()} onSave={() => {}} />)
+    render(withQueryProvider(() => <ManualEntry existingCar={createExistingCar()} onSave={() => {}} />))
     expect(screen.getByText('Save changes')).toBeInTheDocument()
   })
 
   it('populates form with existing car data', () => {
-    render(() => <ManualEntry existingCar={createExistingCar()} onSave={() => {}} />)
+    render(withQueryProvider(() => <ManualEntry existingCar={createExistingCar()} onSave={() => {}} />))
 
     const nicknameInput = screen.getByLabelText('Nickname') as HTMLInputElement
     expect(nicknameInput.value).toBe('My Corolla')
   })
 
   it('disables save when nickname is empty', () => {
-    render(() => <ManualEntry onSave={() => {}} />)
+    render(withQueryProvider(() => <ManualEntry onSave={() => {}} />))
     const saveButton = screen.getByText('Save car') as HTMLButtonElement
     expect(saveButton.disabled).toBe(true)
   })
 
   it('disables save when efficiency is missing', () => {
-    render(() => <ManualEntry onSave={() => {}} />)
+    render(withQueryProvider(() => <ManualEntry onSave={() => {}} />))
 
     fireEvent.input(screen.getByLabelText('Nickname'), { target: { value: 'Test Car' } })
 
@@ -73,7 +74,7 @@ describe('ManualEntry', () => {
   })
 
   it('enables save when nickname and efficiency are provided', () => {
-    render(() => <ManualEntry onSave={() => {}} />)
+    render(withQueryProvider(() => <ManualEntry onSave={() => {}} />))
 
     fireEvent.input(screen.getByLabelText('Nickname'), { target: { value: 'Test Car' } })
     fireEvent.input(screen.getByLabelText('Fuel efficiency (L/100km)'), {
@@ -88,7 +89,7 @@ describe('ManualEntry', () => {
     const onSave = vi.fn()
     mockAddCar.mockResolvedValue({ id: 'new-car' })
 
-    render(() => <ManualEntry onSave={onSave} />)
+    render(withQueryProvider(() => <ManualEntry onSave={onSave} />))
 
     fireEvent.input(screen.getByLabelText('Nickname'), { target: { value: 'Test Car' } })
     fireEvent.input(screen.getByLabelText('Fuel efficiency (L/100km)'), {
@@ -114,7 +115,7 @@ describe('ManualEntry', () => {
     const onSave = vi.fn()
     mockUpdateCar.mockResolvedValue(undefined)
 
-    render(() => <ManualEntry existingCar={createExistingCar()} onSave={onSave} />)
+    render(withQueryProvider(() => <ManualEntry existingCar={createExistingCar()} onSave={onSave} />))
 
     fireEvent.input(screen.getByLabelText('Nickname'), { target: { value: 'Updated Name' } })
 
@@ -133,7 +134,7 @@ describe('ManualEntry', () => {
   })
 
   it('shows kWh field when fuel type is electric', () => {
-    render(() => <ManualEntry onSave={() => {}} />)
+    render(withQueryProvider(() => <ManualEntry onSave={() => {}} />))
 
     fireEvent.change(screen.getByLabelText('Fuel type'), { target: { value: 'electric' } })
 
@@ -142,7 +143,7 @@ describe('ManualEntry', () => {
   })
 
   it('shows both kWh and L/100km fields when fuel type is phev', () => {
-    render(() => <ManualEntry onSave={() => {}} />)
+    render(withQueryProvider(() => <ManualEntry onSave={() => {}} />))
 
     fireEvent.change(screen.getByLabelText('Fuel type'), { target: { value: 'phev' } })
 
@@ -151,7 +152,7 @@ describe('ManualEntry', () => {
   })
 
   it('requires kWh efficiency for electric cars', () => {
-    render(() => <ManualEntry onSave={() => {}} />)
+    render(withQueryProvider(() => <ManualEntry onSave={() => {}} />))
 
     fireEvent.change(screen.getByLabelText('Fuel type'), { target: { value: 'electric' } })
     fireEvent.input(screen.getByLabelText('Nickname'), { target: { value: 'My EV' } })

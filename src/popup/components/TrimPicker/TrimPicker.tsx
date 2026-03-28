@@ -1,4 +1,5 @@
-import { createSignal, onMount, For, Show, type Component } from 'solid-js'
+import { For, Show, type Component } from 'solid-js'
+import { createQuery } from '@tanstack/solid-query'
 import * as s from './TrimPicker.css'
 import { getTrims } from '@utils/carLookup'
 import type { CarQueryTrim } from '@utils/types'
@@ -6,25 +7,19 @@ import type { CarQueryTrim } from '@utils/types'
 interface TrimPickerProps {
   make: string
   model: string
-  year: number
+  year?: number
   onSelect: (trim: CarQueryTrim) => void
   onBack: () => void
 }
 
 export const TrimPicker: Component<TrimPickerProps> = (props) => {
-  const [trims, setTrims] = createSignal<CarQueryTrim[]>([])
-  const [loading, setLoading] = createSignal(true)
+  const trimsQuery = createQuery(() => ({
+    queryKey: ['carTrims', props.make, props.model, props.year] as const,
+    queryFn: () => getTrims(props.make, props.model, props.year),
+    staleTime: 5 * 60_000,
+  }))
 
-  onMount(async () => {
-    try {
-      const t = await getTrims(props.make, props.model, props.year)
-      setTrims(t)
-    } catch {
-      setTrims([])
-    } finally {
-      setLoading(false)
-    }
-  })
+  const trims = () => trimsQuery.data ?? []
 
   const formatEngine = (trim: CarQueryTrim): string => {
     const parts: string[] = []
@@ -45,16 +40,21 @@ export const TrimPicker: Component<TrimPickerProps> = (props) => {
       </div>
       <div class={s.subheading}>Select your trim variant:</div>
 
-      <Show when={loading()}>
+      <Show when={trimsQuery.isLoading}>
         <span class={s.loading}>Loading trims...</span>
       </Show>
 
-      <Show when={!loading() && trims().length > 0}>
+      <Show when={!trimsQuery.isLoading && trims().length > 0}>
         <div class={s.trimList}>
           <For each={trims()}>
             {(trim) => (
               <button class={s.trimItem} onClick={() => props.onSelect(trim)}>
-                <div class={s.trimName}>{trim.modelTrim || 'Base'}</div>
+                <div class={s.trimName}>
+                  {trim.modelTrim || 'Base'}
+                  <Show when={trim.modelYear}>
+                    <span class={s.trimYear}> ({trim.modelYear})</span>
+                  </Show>
+                </div>
                 <div class={s.trimMeta}>{formatEngine(trim)}</div>
               </button>
             )}
@@ -62,7 +62,7 @@ export const TrimPicker: Component<TrimPickerProps> = (props) => {
         </div>
       </Show>
 
-      <Show when={!loading() && trims().length === 0}>
+      <Show when={!trimsQuery.isLoading && trims().length === 0}>
         <span class={s.loading}>No trims found</span>
       </Show>
     </div>

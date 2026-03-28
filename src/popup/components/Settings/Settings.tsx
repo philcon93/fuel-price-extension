@@ -1,9 +1,9 @@
-import { createSignal, onMount, Show, type Component } from 'solid-js'
+import { createSignal, Show, type Component } from 'solid-js'
+import { createQuery, useQueryClient } from '@tanstack/solid-query'
 import * as s from './Settings.css'
 import { getAppState, updateSettings, updateFuelPrices } from '@utils/storage'
 import {
   AVERAGE_CAR_ID,
-  type AppState,
   type Currency,
   type DistanceUnit,
   type EfficiencyUnit,
@@ -16,32 +16,38 @@ interface SettingsProps {
 }
 
 export const Settings: Component<SettingsProps> = () => {
-  const [state, setState] = createSignal<AppState | null>(null)
+  const queryClient = useQueryClient()
   const [refreshing, setRefreshing] = createSignal(false)
   const [analyticsOptOut, setAnalyticsOptOut] = createSignal(false)
 
-  onMount(async () => {
-    setState(await getAppState())
-    setAnalyticsOptOut(await isOptedOut())
-  })
+  const stateQuery = createQuery(() => ({
+    queryKey: ['appState'] as const,
+    queryFn: getAppState,
+  }))
+
+  const state = () => stateQuery.data ?? null
+
+  isOptedOut().then(setAnalyticsOptOut)
 
   const isAverageActive = () => state()?.activeCarId === AVERAGE_CAR_ID
 
+  const refreshState = () => queryClient.invalidateQueries({ queryKey: ['appState'] })
+
   const handleDistanceUnit = async (unit: DistanceUnit) => {
     await updateSettings({ distanceUnit: unit })
-    setState(await getAppState())
+    await refreshState()
     AnalyticsEvents.settingsChanged('distanceUnit', unit)
   }
 
   const handleEfficiencyUnit = async (unit: EfficiencyUnit) => {
     await updateSettings({ efficiencyUnit: unit })
-    setState(await getAppState())
+    await refreshState()
     AnalyticsEvents.settingsChanged('efficiencyUnit', unit)
   }
 
   const handleCurrency = async (currency: Currency) => {
     await updateSettings({ currency })
-    setState(await getAppState())
+    await refreshState()
     AnalyticsEvents.settingsChanged('currency', currency)
   }
 
@@ -49,7 +55,7 @@ export const Settings: Component<SettingsProps> = () => {
     if (isAverageActive()) return
     const current = state()?.settings.showAverageComparison ?? true
     await updateSettings({ showAverageComparison: !current })
-    setState(await getAppState())
+    await refreshState()
     AnalyticsEvents.settingsChanged('showAverageComparison', String(!current))
   }
 
@@ -64,7 +70,7 @@ export const Settings: Component<SettingsProps> = () => {
     try {
       const prices = await fetchFuelPrices(true)
       await updateFuelPrices(prices)
-      setState(await getAppState())
+      await refreshState()
     } catch (e) {
       console.error('[Fuel Cost] Refresh failed:', e)
     } finally {
@@ -86,7 +92,7 @@ export const Settings: Component<SettingsProps> = () => {
       source: 'Manual override',
       lastUpdated: Date.now(),
     })
-    setState(await getAppState())
+    await refreshState()
   }
 
   const formatLastUpdated = (ts: number): string => {

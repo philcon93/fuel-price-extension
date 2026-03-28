@@ -1,4 +1,5 @@
 import { createSignal, createEffect, Show, For, type Component } from 'solid-js'
+import { createQuery, useQueryClient } from '@tanstack/solid-query'
 import * as s from './CarSearch.css'
 import { searchCars, type CarResult } from '@utils/carLookup'
 import { addCar, getAppState, removeCar } from '@utils/storage'
@@ -13,9 +14,9 @@ interface CarSearchProps {
 }
 
 export const CarSearch: Component<CarSearchProps> = (props) => {
+  const queryClient = useQueryClient()
   const [query, setQuery] = createSignal('')
-  const [results, setResults] = createSignal<CarResult[]>([])
-  const [loading, setLoading] = createSignal(false)
+  const [debouncedQuery, setDebouncedQuery] = createSignal('')
   const [showManual, setShowManual] = createSignal(false)
   const [selectedResult, setSelectedResult] = createSignal<CarResult | null>(null)
   const [editCar, setEditCar] = createSignal<CarProfile | null>(null)
@@ -38,22 +39,29 @@ export const CarSearch: Component<CarSearchProps> = (props) => {
     setSelectedResult(null)
     clearTimeout(debounceTimer)
     if (value.trim().length < 2) {
-      setResults([])
+      setDebouncedQuery('')
       return
     }
-    debounceTimer = setTimeout(async () => {
-      setLoading(true)
-      try {
-        const r = await searchCars(value)
-        setResults(r)
-        AnalyticsEvents.carSearchPerformed(value.length, r.length)
-      } catch {
-        setResults([])
-      } finally {
-        setLoading(false)
-      }
+    debounceTimer = setTimeout(() => {
+      setDebouncedQuery(value)
     }, 400)
   }
+
+  const searchQuery = createQuery(() => ({
+    queryKey: ['carSearch', debouncedQuery()] as const,
+    queryFn: async () => {
+      const q = debouncedQuery()
+      if (!q || q.trim().length < 2) return []
+      const results = await searchCars(q)
+      AnalyticsEvents.carSearchPerformed(q.length, results.length)
+      return results
+    },
+    enabled: debouncedQuery().trim().length >= 2,
+    staleTime: 60_000,
+  }))
+
+  const results = () => searchQuery.data ?? []
+  const loading = () => searchQuery.isLoading && debouncedQuery().trim().length >= 2
 
   const handleSelectResult = (result: CarResult) => {
     setSelectedResult(result)
@@ -78,6 +86,7 @@ export const CarSearch: Component<CarSearchProps> = (props) => {
       isManual: false,
     }
     await addCar(profile)
+    await queryClient.invalidateQueries({ queryKey: ['appState'] })
     AnalyticsEvents.trimSelected(profile.fuelType)
     AnalyticsEvents.carAdded('lookup', profile.fuelType)
     props.onDone()
@@ -86,6 +95,7 @@ export const CarSearch: Component<CarSearchProps> = (props) => {
   const handleDelete = async () => {
     if (props.editCarId && confirm('Delete this car profile?')) {
       await removeCar(props.editCarId)
+      await queryClient.invalidateQueries({ queryKey: ['appState'] })
       props.onDone()
     }
   }
@@ -97,7 +107,7 @@ export const CarSearch: Component<CarSearchProps> = (props) => {
           <input
             class={s.searchInput}
             type="text"
-            placeholder='Search e.g. "Corolla 2023 hybrid"'
+            placeholder='Search e.g. "Toyota Corolla 2020"'
             value={query()}
             onInput={(e) => handleSearch(e.currentTarget.value)}
             autofocus
@@ -115,10 +125,9 @@ export const CarSearch: Component<CarSearchProps> = (props) => {
                     <div class={s.resultTitle}>
                       {result.makeDisplay} {result.modelName}
                     </div>
-                    <div class={s.resultMeta}>
-                      {result.modelYear} · {result.trimCount} trim
-                      {result.trimCount !== 1 ? 's' : ''}
-                    </div>
+                    <Show when={result.modelYear}>
+                      <div class={s.resultMeta}>{result.modelYear}</div>
+                    </Show>
                   </button>
                 )}
               </For>
