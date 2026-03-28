@@ -231,13 +231,24 @@ function startObserver() {
   })
 }
 
+function refreshCosts() {
+  cachedState = null
+  processedNodes = new WeakSet()
+  removeExistingHosts()
+  debouncedScan()
+}
+
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === 'sync' && changes[STORAGE_KEY]) {
+    refreshCosts()
+  }
+})
+
 let lastUrl = location.href
 const urlCheckInterval = setInterval(() => {
   if (location.href !== lastUrl) {
     lastUrl = location.href
-    processedNodes = new WeakSet()
-    removeExistingHosts()
-    debouncedScan()
+    refreshCosts()
   }
 }, 1000)
 
