@@ -266,7 +266,7 @@ describe('Home', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByText(/Toyota Corolla/)).toBeInTheDocument()
+      expect(screen.getByText(/Petrol · 7\.5 L\/100km/)).toBeInTheDocument()
     })
   })
 
@@ -280,7 +280,7 @@ describe('Home', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByText('Fleet average for your region')).toBeInTheDocument()
+      expect(screen.getByText(/Fleet average · 10 L\/100km/)).toBeInTheDocument()
     })
   })
 })

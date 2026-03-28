@@ -25,14 +25,27 @@ export const Home: Component<HomeProps> = (props) => {
   const activeCar = (): CarProfile | undefined =>
     state()?.cars.find((c) => c.id === state()?.activeCarId)
 
+  const formatEfficiency = (car: CarProfile): string | null => {
+    const unit = state()?.settings.efficiencyUnit ?? 'l100km'
+    if (car.fuelType === 'electric') {
+      const kwh = car.kWh100km
+      return kwh ? `${kwh} kWh/100km` : null
+    }
+    const l100km = car.useRealWorld ? car.realWorldL100km : car.officialL100km
+    if (!l100km) return null
+    if (unit === 'mpg') return `${Math.round(235.215 / l100km)} MPG`
+    return `${l100km} L/100km`
+  }
+
   const carSummaryText = (car: CarProfile): string => {
-    if (car.isDefault) return 'Fleet average for your region'
+    const eff = formatEfficiency(car)
+    if (car.isDefault) {
+      return eff ? `Fleet average · ${eff}` : 'Fleet average for your region'
+    }
     const parts: string[] = []
-    if (car.make && car.model) parts.push(`${car.make} ${car.model}`)
-    if (car.year) parts.push(`${car.year}`)
     if (car.fuelType) parts.push(car.fuelType.charAt(0).toUpperCase() + car.fuelType.slice(1))
-    const eff = car.useRealWorld ? car.realWorldL100km : car.officialL100km
-    if (eff) parts.push(`${eff} L/100km`)
+    if (car.engineSizeL) parts.push(`${car.engineSizeL}L`)
+    if (eff) parts.push(eff)
     return parts.join(' · ')
   }
 
