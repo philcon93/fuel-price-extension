@@ -55,6 +55,7 @@ export interface AppState {
 
 export type PopupView =
   | { kind: 'home' }
+  | { kind: 'cars' }
   | { kind: 'addCar' }
   | { kind: 'editCar'; carId: string }
   | { kind: 'settings' }

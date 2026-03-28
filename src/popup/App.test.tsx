@@ -79,29 +79,37 @@ beforeEach(() => {
 })
 
 describe('App', () => {
-  it('renders with home view by default', async () => {
+  it('renders with NavBar containing all tabs', async () => {
     render(withQueryProvider(() => <App />))
 
     await waitFor(() => {
-      expect(screen.getByText('Fuel Cost')).toBeInTheDocument()
-    })
-  })
-
-  it('shows settings button on home view', async () => {
-    render(withQueryProvider(() => <App />))
-
-    await waitFor(() => {
+      expect(screen.getByLabelText('Dashboard')).toBeInTheDocument()
+      expect(screen.getByLabelText('Cars')).toBeInTheDocument()
+      expect(screen.getByLabelText('History')).toBeInTheDocument()
       expect(screen.getByLabelText('Settings')).toBeInTheDocument()
     })
   })
 
-  it('does not show back button on home view', async () => {
+  it('shows home/dashboard view by default', async () => {
     render(withQueryProvider(() => <App />))
 
     await waitFor(() => {
-      expect(screen.getByText('Fuel Cost')).toBeInTheDocument()
+      expect(screen.getByText('Local Fuel Rates')).toBeInTheDocument()
     })
-    expect(screen.queryByLabelText('Go back')).not.toBeInTheDocument()
+  })
+
+  it('navigates to cars view', async () => {
+    render(withQueryProvider(() => <App />))
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Cars')).toBeInTheDocument()
+    })
+
+    fireEvent.click(screen.getByLabelText('Cars'))
+
+    await waitFor(() => {
+      expect(screen.getByText('Your Garage')).toBeInTheDocument()
+    })
   })
 
   it('navigates to settings view', async () => {
@@ -114,12 +122,11 @@ describe('App', () => {
     fireEvent.click(screen.getByLabelText('Settings'))
 
     await waitFor(() => {
-      expect(screen.getByText('Settings')).toBeInTheDocument()
-      expect(screen.getByLabelText('Go back')).toBeInTheDocument()
+      expect(screen.getByText('System Config')).toBeInTheDocument()
     })
   })
 
-  it('navigates back to home from settings', async () => {
+  it('navigates back to dashboard', async () => {
     render(withQueryProvider(() => <App />))
 
     await waitFor(() => {
@@ -129,28 +136,13 @@ describe('App', () => {
     fireEvent.click(screen.getByLabelText('Settings'))
 
     await waitFor(() => {
-      expect(screen.getByLabelText('Go back')).toBeInTheDocument()
+      expect(screen.getByText('System Config')).toBeInTheDocument()
     })
 
-    fireEvent.click(screen.getByLabelText('Go back'))
+    fireEvent.click(screen.getByLabelText('Dashboard'))
 
     await waitFor(() => {
-      expect(screen.getByText('Fuel Cost')).toBeInTheDocument()
-    })
-  })
-
-  it('navigates to add car view', async () => {
-    render(withQueryProvider(() => <App />))
-
-    await waitFor(() => {
-      expect(screen.getByText('Add a car')).toBeInTheDocument()
-    })
-
-    fireEvent.click(screen.getByText('Add a car'))
-
-    await waitFor(() => {
-      expect(screen.getByText('Add a car')).toBeInTheDocument()
-      expect(screen.getByLabelText('Go back')).toBeInTheDocument()
+      expect(screen.getByText('Local Fuel Rates')).toBeInTheDocument()
     })
   })
 })

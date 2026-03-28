@@ -2,8 +2,9 @@ import { createSignal, Match, Switch, type Component } from 'solid-js'
 import { themeClass } from './styles/theme.css'
 import './styles/global.css'
 import type { PopupView } from '@utils/types'
-import { Header } from '@components/Header'
+import { NavBar } from '@components/NavBar'
 import { Home } from '@components/Home'
+import { Cars } from '@components/Cars'
 import { CarSearch } from '@components/CarSearch'
 import { Settings } from '@components/Settings'
 import { TripHistory } from '@components/TripHistory'
@@ -11,40 +12,21 @@ import { TripHistory } from '@components/TripHistory'
 export const App: Component = () => {
   const [view, setView] = createSignal<PopupView>({ kind: 'home' })
 
-  const title = () => {
-    const v = view()
-    switch (v.kind) {
-      case 'home':
-        return 'Fuel Cost'
-      case 'addCar':
-        return 'Add a car'
-      case 'editCar':
-        return 'Edit car'
-      case 'settings':
-        return 'Settings'
-      case 'history':
-        return 'Trip History'
-    }
+  const handleNavigate = (kind: PopupView['kind']) => {
+    setView({ kind } as PopupView)
   }
-
-  const showBack = () => view().kind !== 'home'
 
   return (
     <div class={themeClass}>
-      <Header
-        title={title()}
-        showBack={showBack()}
-        onBack={() => setView({ kind: 'home' })}
-        onSettings={() => setView({ kind: 'settings' })}
-        showSettings={view().kind === 'home'}
-      />
+      <NavBar activeView={view().kind} onNavigate={handleNavigate} />
       <Switch>
         <Match when={view().kind === 'home'}>
-          <Home
+          <Home />
+        </Match>
+        <Match when={view().kind === 'cars'}>
+          <Cars
             onAddCar={() => setView({ kind: 'addCar' })}
             onEditCar={(id) => setView({ kind: 'editCar', carId: id })}
-            onSettings={() => setView({ kind: 'settings' })}
-            onHistory={() => setView({ kind: 'history' })}
           />
         </Match>
         <Match when={view().kind === 'addCar' || view().kind === 'editCar'}>
@@ -54,7 +36,7 @@ export const App: Component = () => {
                 ? (view() as { kind: 'editCar'; carId: string }).carId
                 : undefined
             }
-            onDone={() => setView({ kind: 'home' })}
+            onDone={() => setView({ kind: 'cars' })}
           />
         </Match>
         <Match when={view().kind === 'settings'}>

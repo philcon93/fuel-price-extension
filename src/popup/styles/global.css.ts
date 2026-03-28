@@ -10,10 +10,10 @@ globalStyle('*, *::before, *::after', {
 globalStyle('html, body', {
   width: '380px',
   minHeight: '200px',
-  fontFamily: vars.font.family,
-  fontSize: vars.font.base,
-  color: vars.color.text,
-  backgroundColor: vars.color.bg,
+  fontFamily: "'Manrope', sans-serif",
+  fontSize: '14px',
+  color: '#f0f8fc',
+  backgroundColor: '#070f12',
   lineHeight: 1.5,
   WebkitFontSmoothing: 'antialiased',
 })
@@ -32,10 +32,28 @@ globalStyle('input, select', {
 })
 
 globalStyle('a', {
-  color: vars.color.accent,
+  color: vars.color.primary,
   textDecoration: 'none',
 })
 
 globalStyle('a:hover', {
   textDecoration: 'underline',
+})
+
+globalStyle('.material-symbols-outlined', {
+  fontVariationSettings: "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24",
+  verticalAlign: 'middle',
+})
+
+globalStyle('::-webkit-scrollbar', {
+  width: '4px',
+})
+
+globalStyle('::-webkit-scrollbar-track', {
+  background: '#070f12',
+})
+
+globalStyle('::-webkit-scrollbar-thumb', {
+  background: '#1c272c',
+  borderRadius: '10px',
 })

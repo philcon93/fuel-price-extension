@@ -110,21 +110,42 @@ export const Settings: Component<SettingsProps> = () => {
     <Show when={state()} fallback={<div class={s.container}>Loading...</div>}>
       {(appState) => (
         <div class={s.container}>
-          <div class={s.section}>
-            <span class={s.sectionTitle}>Units</span>
-            <div class={s.row}>
-              <span class={s.label}>Distance</span>
-              <select
-                class={s.select}
-                value={appState().settings.distanceUnit}
-                onChange={(e) => handleDistanceUnit(e.currentTarget.value as DistanceUnit)}
-              >
-                <option value="km">Kilometres</option>
-                <option value="miles">Miles</option>
-              </select>
+          <div class={s.pageHeader}>
+            <h1 class={s.pageTitle}>System Config</h1>
+            <p class={s.pageSubtitle}>Fine-tune your navigation experience</p>
+          </div>
+
+          <div class={s.unitsGrid}>
+            <div class={s.unitCard}>
+              <div class={s.unitCardHeader}>
+                <span class={`material-symbols-outlined ${s.iconColorPrimary}`}>
+                  distance
+                </span>
+                <span class={s.unitCardTitle}>Distance</span>
+              </div>
+              <div class={s.segmentedControl}>
+                <button
+                  class={`${s.segmentButton} ${appState().settings.distanceUnit === 'km' ? s.segmentButtonActive : ''}`}
+                  onClick={() => handleDistanceUnit('km')}
+                >
+                  KM
+                </button>
+                <button
+                  class={`${s.segmentButton} ${appState().settings.distanceUnit === 'miles' ? s.segmentButtonActive : ''}`}
+                  onClick={() => handleDistanceUnit('miles')}
+                >
+                  MI
+                </button>
+              </div>
             </div>
-            <div class={s.row}>
-              <span class={s.label}>Fuel efficiency</span>
+
+            <div class={s.unitCard}>
+              <div class={s.unitCardHeader}>
+                <span class={`material-symbols-outlined ${s.iconColorTertiary}`}>
+                  speed
+                </span>
+                <span class={s.unitCardTitle}>Efficiency</span>
+              </div>
               <select
                 class={s.select}
                 value={appState().settings.efficiencyUnit}
@@ -138,11 +159,20 @@ export const Settings: Component<SettingsProps> = () => {
           </div>
 
           <div class={s.section}>
-            <span class={s.sectionTitle}>Currency</span>
             <div class={s.row}>
-              <span class={s.label}>Currency</span>
+              <div class={s.rowInfo}>
+                <div class={`${s.rowIcon} ${s.rowIconBgSecondary}`}>
+                  <span class={`material-symbols-outlined ${s.iconColorSecondary}`}>
+                    payments
+                  </span>
+                </div>
+                <div class={s.rowText}>
+                  <span class={s.label}>Currency</span>
+                  <span class={s.sublabel}>Used for all cost projections</span>
+                </div>
+              </div>
               <select
-                class={s.select}
+                class={`${s.select} ${s.selectPrimary}`}
                 value={appState().settings.currency}
                 onChange={(e) => handleCurrency(e.currentTarget.value as Currency)}
               >
@@ -156,12 +186,21 @@ export const Settings: Component<SettingsProps> = () => {
                 <option value="JPY">JPY (¥)</option>
               </select>
             </div>
-          </div>
 
-          <div class={s.section}>
-            <span class={s.sectionTitle}>Display</span>
+            <div class={s.divider} />
+
             <div class={s.row}>
-              <span class={s.label}>Show average comparison</span>
+              <div class={s.rowInfo}>
+                <div class={`${s.rowIcon} ${s.rowIconBgPrimary}`}>
+                  <span class={`material-symbols-outlined ${s.iconColorPrimary}`}>
+                    monitoring
+                  </span>
+                </div>
+                <div class={s.rowText}>
+                  <span class={s.label}>Average Comparison</span>
+                  <span class={s.sublabel}>Show trip efficiency vs average</span>
+                </div>
+              </div>
               <button
                 class={`${s.toggle} ${appState().settings.showAverageComparison && !isAverageActive() ? s.toggleActive : ''} ${isAverageActive() ? s.toggleDisabled : ''}`}
                 onClick={handleToggleComparison}
@@ -179,41 +218,61 @@ export const Settings: Component<SettingsProps> = () => {
           </div>
 
           <div class={s.section}>
-            <span class={s.sectionTitle}>Fuel prices</span>
-            <div class={s.priceRow}>
-              <span class={s.label}>Petrol (per L)</span>
-              <input
-                class={s.priceInput}
-                type="number"
-                step="0.01"
-                min="0"
-                value={appState().fuelPrices.petrolPerLitre}
-                onChange={(e) => handlePriceChange('petrolPerLitre', e.currentTarget.value)}
-              />
+            <div class={s.pricesHeader}>
+              <span class={`material-symbols-outlined ${s.iconColorTertiary}`}>
+                local_gas_station
+              </span>
+              <span class={s.pricesTitle}>Market Rates</span>
             </div>
-            <div class={s.priceRow}>
-              <span class={s.label}>Diesel (per L)</span>
-              <input
-                class={s.priceInput}
-                type="number"
-                step="0.01"
-                min="0"
-                value={appState().fuelPrices.dieselPerLitre}
-                onChange={(e) => handlePriceChange('dieselPerLitre', e.currentTarget.value)}
-              />
+
+            <div class={s.pricesListColumn}>
+              <div class={`${s.priceRow} ${s.priceRowPetrol}`}>
+                <span class={s.priceLabel}>Petrol (95)</span>
+                <div class={s.priceInputGroup}>
+                  <span class={s.priceUnit}>per L</span>
+                  <input
+                    class={`${s.priceInput} ${s.priceInputPetrol}`}
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={appState().fuelPrices.petrolPerLitre}
+                    onChange={(e) => handlePriceChange('petrolPerLitre', e.currentTarget.value)}
+                  />
+                </div>
+              </div>
+              <div class={`${s.priceRow} ${s.priceRowDiesel}`}>
+                <span class={s.priceLabel}>Diesel</span>
+                <div class={s.priceInputGroup}>
+                  <span class={s.priceUnit}>per L</span>
+                  <input
+                    class={`${s.priceInput} ${s.priceInputDiesel}`}
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={appState().fuelPrices.dieselPerLitre}
+                    onChange={(e) => handlePriceChange('dieselPerLitre', e.currentTarget.value)}
+                  />
+                </div>
+              </div>
+              <div class={`${s.priceRow} ${s.priceRowElectric}`}>
+                <span class={s.priceLabel}>Electric</span>
+                <div class={s.priceInputGroup}>
+                  <span class={s.priceUnit}>per kWh</span>
+                  <input
+                    class={`${s.priceInput} ${s.priceInputElectric}`}
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={appState().fuelPrices.electricityPerKwh}
+                    onChange={(e) =>
+                      handlePriceChange('electricityPerKwh', e.currentTarget.value)
+                    }
+                  />
+                </div>
+              </div>
             </div>
-            <div class={s.priceRow}>
-              <span class={s.label}>Electricity (per kWh)</span>
-              <input
-                class={s.priceInput}
-                type="number"
-                step="0.01"
-                min="0"
-                value={appState().fuelPrices.electricityPerKwh}
-                onChange={(e) => handlePriceChange('electricityPerKwh', e.currentTarget.value)}
-              />
-            </div>
-            <div class={s.row}>
+
+            <div class={s.refreshRow}>
               <span class={s.lastUpdated}>
                 {appState().fuelPrices.source} ·{' '}
                 {formatLastUpdated(appState().fuelPrices.lastUpdated)}
@@ -225,9 +284,18 @@ export const Settings: Component<SettingsProps> = () => {
           </div>
 
           <div class={s.section}>
-            <span class={s.sectionTitle}>Privacy</span>
             <div class={s.row}>
-              <span class={s.label}>Disable anonymous analytics</span>
+              <div class={s.rowInfo}>
+                <div class={`${s.rowIcon} ${s.rowIconBgError}`}>
+                  <span class={`material-symbols-outlined ${s.iconColorError}`}>
+                    shield_with_heart
+                  </span>
+                </div>
+                <div class={s.rowText}>
+                  <span class={s.label}>Anonymous Analytics</span>
+                  <span class={s.sublabel}>Help improve with non-identifiable data</span>
+                </div>
+              </div>
               <button
                 class={`${s.toggle} ${analyticsOptOut() ? s.toggleActive : ''}`}
                 onClick={handleAnalyticsToggle}
@@ -236,10 +304,6 @@ export const Settings: Component<SettingsProps> = () => {
                 <div class={`${s.toggleKnob} ${analyticsOptOut() ? s.toggleKnobActive : ''}`} />
               </button>
             </div>
-            <span class={s.hint}>
-              We collect anonymous usage data to improve the extension. No personal data or
-              locations are ever sent.
-            </span>
           </div>
         </div>
       )}

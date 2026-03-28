@@ -7,23 +7,19 @@ describe('Home styles', () => {
     expect(typeof styles.container).toBe('string')
   })
 
-  it('exports section class', () => {
-    expect(styles.section).toBeDefined()
-  })
-
-  it('exports carSelect class', () => {
-    expect(styles.carSelect).toBeDefined()
-  })
-
-  it('exports pricesGrid class', () => {
-    expect(styles.pricesGrid).toBeDefined()
+  it('exports vehicleSection class', () => {
+    expect(styles.vehicleSection).toBeDefined()
   })
 
   it('exports priceCard class', () => {
     expect(styles.priceCard).toBeDefined()
   })
 
-  it('exports addCarLink class', () => {
-    expect(styles.addCarLink).toBeDefined()
+  it('exports pricesList class', () => {
+    expect(styles.pricesList).toBeDefined()
+  })
+
+  it('exports statCard class', () => {
+    expect(styles.statCard).toBeDefined()
   })
 })

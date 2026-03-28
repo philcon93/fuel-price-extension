@@ -1,20 +1,11 @@
-import { For, Show, type Component } from 'solid-js'
-import { createQuery, useQueryClient } from '@tanstack/solid-query'
+import { Show, type Component } from 'solid-js'
+import { createQuery } from '@tanstack/solid-query'
 import * as s from './Home.css'
-import { getAppState, setActiveCarId } from '@utils/storage'
-import { MAX_FREE_CARS, type AppState, type CarProfile } from '@utils/types'
+import { getAppState } from '@utils/storage'
+import type { AppState, CarProfile } from '@utils/types'
 import { formatCost } from '@utils/calculator'
 
-interface HomeProps {
-  onAddCar: () => void
-  onEditCar: (id: string) => void
-  onSettings: () => void
-  onHistory: () => void
-}
-
-export const Home: Component<HomeProps> = (props) => {
-  const queryClient = useQueryClient()
-
+export const Home: Component = () => {
   const stateQuery = createQuery(() => ({
     queryKey: ['appState'] as const,
     queryFn: getAppState,
@@ -25,46 +16,29 @@ export const Home: Component<HomeProps> = (props) => {
   const activeCar = (): CarProfile | undefined =>
     state()?.cars.find((c) => c.id === state()?.activeCarId)
 
-  const formatEfficiency = (car: CarProfile): string | null => {
-    const unit = state()?.settings.efficiencyUnit ?? 'l100km'
+  const formatEfficiency = (car: CarProfile): { value: string; unit: string } | null => {
     if (car.fuelType === 'electric') {
-      const kwh = car.kWh100km
-      return kwh ? `${kwh} kWh/100km` : null
+      return car.kWh100km ? { value: String(car.kWh100km), unit: 'kWh/100km' } : null
     }
     const l100km = car.useRealWorld ? car.realWorldL100km : car.officialL100km
-    if (!l100km) return null
-    if (unit === 'mpg') return `${Math.round(235.215 / l100km)} MPG`
-    return `${l100km} L/100km`
+    return l100km ? { value: String(l100km), unit: 'L/100km' } : null
   }
 
-  const carSummaryText = (car: CarProfile): string => {
-    const eff = formatEfficiency(car)
-    if (car.isDefault) {
-      return eff ? `Fleet average · ${eff}` : 'Fleet average for your region'
+  const fuelTypeLabel = (car: CarProfile): string => {
+    const labels: Record<string, string> = {
+      petrol: 'Petrol',
+      diesel: 'Diesel',
+      hybrid: 'Hybrid',
+      phev: 'PHEV',
+      electric: 'Electric',
     }
-    const parts: string[] = []
-    if (car.fuelType) parts.push(car.fuelType.charAt(0).toUpperCase() + car.fuelType.slice(1))
-    if (car.engineSizeL) parts.push(`${car.engineSizeL}L`)
-    if (eff) parts.push(eff)
-    return parts.join(' · ')
+    return labels[car.fuelType] ?? car.fuelType
   }
 
-  const handleCarChange = async (e: Event) => {
-    const select = e.target as HTMLSelectElement
-    await setActiveCarId(select.value)
-    await queryClient.invalidateQueries({ queryKey: ['appState'] })
-  }
-
-  const handleAddCar = () => {
-    const s = state()
-    if (!s) return
-    const customCars = s.cars.filter((c) => !c.isDefault).length
-    if (customCars >= MAX_FREE_CARS) {
-      alert('Upgrade to Pro for unlimited car profiles')
-      return
-    }
-    props.onAddCar()
-  }
+  const chipVariantKey = (fuelType: string): keyof typeof s.chipVariant =>
+    fuelType in s.chipVariant
+      ? (fuelType as keyof typeof s.chipVariant)
+      : 'petrol'
 
   const formatPrice = (price: number, currency: string): string => {
     return formatCost(price, currency as AppState['settings']['currency'])
@@ -85,93 +59,109 @@ export const Home: Component<HomeProps> = (props) => {
     <Show when={state()} fallback={<div class={s.container}>Loading...</div>}>
       {(appState) => (
         <div class={s.container}>
-          <div class={s.section}>
-            <span class={s.sectionLabel}>Active car</span>
-            <select class={s.carSelect} value={appState().activeCarId} onChange={handleCarChange}>
-              <For each={appState().cars}>
-                {(car) => <option value={car.id}>{car.nickname}</option>}
-              </For>
-            </select>
-            <Show when={activeCar()}>
-              {(car) => (
-                <div class={s.carSummary}>
-                  {carSummaryText(car())}
-                  <Show when={!car().isLocked}>
-                    {' · '}
-                    <button
-                      class={s.addCarLink}
-                      onClick={() => props.onEditCar(car().id)}
-                      style={{ display: 'inline', 'font-size': 'inherit' }}
-                    >
-                      Edit
-                    </button>
-                  </Show>
+          <Show when={activeCar()}>
+            {(car) => {
+              const eff = () => formatEfficiency(car())
+              return (
+                <div class={s.vehicleSection}>
+                  <span class={s.vehicleLabel}>Active Vessel</span>
+                  <h2 class={s.vehicleName}>{car().nickname}</h2>
+
+                  <div class={s.fuelChips}>
+                    <span class={`${s.chip} ${s.chipVariant[chipVariantKey(car().fuelType)]}`}>
+                      {fuelTypeLabel(car())}
+                    </span>
+                  </div>
+
+                  <div class={s.vehicleStats}>
+                    <div class={`${s.statCard} ${s.statCardPrimary}`}>
+                      <span class={s.statLabel}>Avg Consumption</span>
+                      <Show when={eff()} fallback={<span class={s.statValue}>N/A</span>}>
+                        {(e) => (
+                          <div>
+                            <span class={s.statValue}>{e().value}</span>
+                            <span class={s.statUnit}>{e().unit}</span>
+                          </div>
+                        )}
+                      </Show>
+                    </div>
+                    <div class={`${s.statCard} ${s.statCardTertiary}`}>
+                      <span class={s.statLabel}>Engine</span>
+                      <div>
+                        <span class={s.statValue}>
+                          {car().engineSizeL ? `${car().engineSizeL}L` : '--'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              )}
-            </Show>
-          </div>
+              )
+            }}
+          </Show>
 
-          <div style={{ display: 'flex', gap: '16px', 'align-items': 'center' }}>
-            <button class={s.addCarLink} onClick={handleAddCar}>
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path
-                  d="M7 1V13M1 7H13"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                />
-              </svg>
-              Add a car
-            </button>
-            <button class={s.addCarLink} onClick={() => props.onHistory()}>
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path
-                  d="M7 1v12M1 7a6 6 0 1112 0A6 6 0 011 7z"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  fill="none"
-                />
-                <path
-                  d="M7 4v3l2 2"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-              Trip history
-            </button>
-          </div>
+          <div class={s.pricesSection}>
+            <div class={s.pricesHeader}>
+              <h3 class={s.pricesTitle}>Local Fuel Rates</h3>
+              <span class={s.pricesLocation}>
+                <span class={`material-symbols-outlined ${s.iconSm}`}>
+                  location_on
+                </span>
+                {appState().fuelPrices.source}
+              </span>
+            </div>
 
-          <div class={s.section}>
-            <span class={s.sectionLabel}>Fuel prices</span>
-            <div class={s.pricesGrid}>
-              <div class={s.priceCard}>
-                <span class={s.priceLabel}>Petrol</span>
-                <span class={s.priceValue}>
+            <div class={s.pricesList}>
+              <div class={`${s.priceCard} ${s.priceCardPetrol}`}>
+                <div class={s.priceCardLeft}>
+                  <div class={`${s.priceIcon} ${s.priceIconVariant.petrol}`}>
+                    <span class="material-symbols-outlined">local_gas_station</span>
+                  </div>
+                  <div class={s.priceInfo}>
+                    <span class={s.priceName}>Unleaded</span>
+                    <span class={s.priceSubtext}>per litre</span>
+                  </div>
+                </div>
+                <span class={`${s.priceValue} ${s.priceValueVariant.petrol}`}>
                   {formatPrice(appState().fuelPrices.petrolPerLitre, appState().settings.currency)}
                 </span>
               </div>
-              <div class={s.priceCard}>
-                <span class={s.priceLabel}>Diesel</span>
-                <span class={s.priceValue}>
+
+              <div class={`${s.priceCard} ${s.priceCardDiesel}`}>
+                <div class={s.priceCardLeft}>
+                  <div class={`${s.priceIcon} ${s.priceIconVariant.diesel}`}>
+                    <span class="material-symbols-outlined">oil_barrel</span>
+                  </div>
+                  <div class={s.priceInfo}>
+                    <span class={s.priceName}>Diesel</span>
+                    <span class={s.priceSubtext}>per litre</span>
+                  </div>
+                </div>
+                <span class={`${s.priceValue} ${s.priceValueVariant.diesel}`}>
                   {formatPrice(appState().fuelPrices.dieselPerLitre, appState().settings.currency)}
                 </span>
               </div>
-              <div class={s.priceCard}>
-                <span class={s.priceLabel}>Electric</span>
-                <span class={s.priceValue}>
+
+              <div class={`${s.priceCard} ${s.priceCardElectric}`}>
+                <div class={s.priceCardLeft}>
+                  <div class={`${s.priceIcon} ${s.priceIconVariant.electric}`}>
+                    <span class="material-symbols-outlined">bolt</span>
+                  </div>
+                  <div class={s.priceInfo}>
+                    <span class={s.priceName}>Electric</span>
+                    <span class={s.priceSubtext}>per kWh</span>
+                  </div>
+                </div>
+                <span class={`${s.priceValue} ${s.priceValueVariant.electric}`}>
                   {formatPrice(
                     appState().fuelPrices.electricityPerKwh,
                     appState().settings.currency,
                   )}
-                  /kWh
                 </span>
               </div>
             </div>
+
             <span class={s.lastUpdated}>
-              {appState().fuelPrices.source} · Updated{' '}
-              {formatLastUpdated(appState().fuelPrices.lastUpdated)}
+              Updated {formatLastUpdated(appState().fuelPrices.lastUpdated)}
             </span>
           </div>
         </div>

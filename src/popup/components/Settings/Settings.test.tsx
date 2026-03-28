@@ -64,19 +64,17 @@ describe('Settings', () => {
     expect(screen.getByText('Loading...')).toBeInTheDocument()
   })
 
-  it('renders settings sections after loading', async () => {
+  it('renders settings page title after loading', async () => {
     mockGetAppState.mockResolvedValue(createMockState())
 
     render(withQueryProvider(() => <Settings onBack={() => {}} />))
 
     await waitFor(() => {
-      expect(screen.getByText('Units')).toBeInTheDocument()
+      expect(screen.getByText('System Config')).toBeInTheDocument()
     })
-    expect(screen.getByText('Display')).toBeInTheDocument()
-    expect(screen.getByText('Fuel prices')).toBeInTheDocument()
   })
 
-  it('renders distance unit selector with correct value', async () => {
+  it('renders distance unit controls', async () => {
     mockGetAppState.mockResolvedValue(createMockState())
 
     render(withQueryProvider(() => <Settings onBack={() => {}} />))
@@ -84,27 +82,32 @@ describe('Settings', () => {
     await waitFor(() => {
       expect(screen.getByText('Distance')).toBeInTheDocument()
     })
-
-    const distanceSelects = screen.getAllByRole('combobox')
-    const distanceSelect = distanceSelects[0] as HTMLSelectElement
-    expect(distanceSelect.value).toBe('km')
+    expect(screen.getByText('KM')).toBeInTheDocument()
+    expect(screen.getByText('MI')).toBeInTheDocument()
   })
 
-  it('updates distance unit on change', async () => {
-    const state = createMockState()
-    mockGetAppState.mockResolvedValue(state)
+  it('updates distance unit on button click', async () => {
+    mockGetAppState.mockResolvedValue(createMockState())
     mockUpdateSettings.mockResolvedValue(undefined)
 
     render(withQueryProvider(() => <Settings onBack={() => {}} />))
 
     await waitFor(() => {
-      expect(screen.getByText('Distance')).toBeInTheDocument()
+      expect(screen.getByText('MI')).toBeInTheDocument()
     })
 
-    const distanceSelects = screen.getAllByRole('combobox')
-    fireEvent.change(distanceSelects[0], { target: { value: 'miles' } })
-
+    fireEvent.click(screen.getByText('MI'))
     expect(mockUpdateSettings).toHaveBeenCalledWith({ distanceUnit: 'miles' })
+  })
+
+  it('renders currency selector', async () => {
+    mockGetAppState.mockResolvedValue(createMockState())
+
+    render(withQueryProvider(() => <Settings onBack={() => {}} />))
+
+    await waitFor(() => {
+      expect(screen.getByText('Currency')).toBeInTheDocument()
+    })
   })
 
   it('updates currency on change', async () => {
@@ -114,7 +117,7 @@ describe('Settings', () => {
     render(withQueryProvider(() => <Settings onBack={() => {}} />))
 
     await waitFor(() => {
-      expect(screen.getByText('Units')).toBeInTheDocument()
+      expect(screen.getByText('Currency')).toBeInTheDocument()
     })
 
     const selects = screen.getAllByRole('combobox')
@@ -151,40 +154,16 @@ describe('Settings', () => {
     })
   })
 
-  it('enables comparison toggle when non-average car is active', async () => {
-    const state = createMockState({ activeCarId: 'custom-car' })
-    state.cars.push({
-      id: 'custom-car',
-      nickname: 'My Car',
-      isDefault: false,
-      isLocked: false,
-      fuelType: 'petrol',
-      realWorldL100km: 8,
-      useRealWorld: true,
-      isManual: true,
-    })
-    mockGetAppState.mockResolvedValue(state)
-
-    render(withQueryProvider(() => <Settings onBack={() => {}} />))
-
-    await waitFor(() => {
-      expect(screen.getByLabelText('Toggle average comparison')).toBeInTheDocument()
-    })
-
-    const toggle = screen.getByLabelText('Toggle average comparison') as HTMLButtonElement
-    expect(toggle.disabled).toBe(false)
-  })
-
   it('renders fuel price inputs', async () => {
     mockGetAppState.mockResolvedValue(createMockState())
 
     render(withQueryProvider(() => <Settings onBack={() => {}} />))
 
     await waitFor(() => {
-      expect(screen.getByText('Petrol (per L)')).toBeInTheDocument()
+      expect(screen.getByText('Petrol (95)')).toBeInTheDocument()
     })
-    expect(screen.getByText('Diesel (per L)')).toBeInTheDocument()
-    expect(screen.getByText('Electricity (per kWh)')).toBeInTheDocument()
+    expect(screen.getByText('Diesel')).toBeInTheDocument()
+    expect(screen.getByText('Electric')).toBeInTheDocument()
   })
 
   it('shows the Refresh button', async () => {

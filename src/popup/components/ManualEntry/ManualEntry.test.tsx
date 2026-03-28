@@ -41,14 +41,14 @@ describe('ManualEntry', () => {
     expect(screen.getByLabelText('Fuel efficiency (L/100km)')).toBeInTheDocument()
   })
 
-  it('shows "Save car" button for new cars', () => {
+  it('shows "Save Car" button for new cars', () => {
     render(withQueryProvider(() => <ManualEntry onSave={() => {}} />))
-    expect(screen.getByText('Save car')).toBeInTheDocument()
+    expect(screen.getByText('Save Car')).toBeInTheDocument()
   })
 
-  it('shows "Save changes" button for existing cars', () => {
+  it('shows "Save Changes" button for existing cars', () => {
     render(withQueryProvider(() => <ManualEntry existingCar={createExistingCar()} onSave={() => {}} />))
-    expect(screen.getByText('Save changes')).toBeInTheDocument()
+    expect(screen.getByText('Save Changes')).toBeInTheDocument()
   })
 
   it('populates form with existing car data', () => {
@@ -60,7 +60,7 @@ describe('ManualEntry', () => {
 
   it('disables save when nickname is empty', () => {
     render(withQueryProvider(() => <ManualEntry onSave={() => {}} />))
-    const saveButton = screen.getByText('Save car') as HTMLButtonElement
+    const saveButton = screen.getByText('Save Car') as HTMLButtonElement
     expect(saveButton.disabled).toBe(true)
   })
 
@@ -69,7 +69,7 @@ describe('ManualEntry', () => {
 
     fireEvent.input(screen.getByLabelText('Nickname'), { target: { value: 'Test Car' } })
 
-    const saveButton = screen.getByText('Save car') as HTMLButtonElement
+    const saveButton = screen.getByText('Save Car') as HTMLButtonElement
     expect(saveButton.disabled).toBe(true)
   })
 
@@ -81,7 +81,7 @@ describe('ManualEntry', () => {
       target: { value: '7.5' },
     })
 
-    const saveButton = screen.getByText('Save car') as HTMLButtonElement
+    const saveButton = screen.getByText('Save Car') as HTMLButtonElement
     expect(saveButton.disabled).toBe(false)
   })
 
@@ -96,7 +96,7 @@ describe('ManualEntry', () => {
       target: { value: '7.5' },
     })
 
-    fireEvent.click(screen.getByText('Save car'))
+    fireEvent.click(screen.getByText('Save Car'))
 
     await waitFor(() => {
       expect(mockAddCar).toHaveBeenCalledWith(
@@ -119,7 +119,7 @@ describe('ManualEntry', () => {
 
     fireEvent.input(screen.getByLabelText('Nickname'), { target: { value: 'Updated Name' } })
 
-    fireEvent.click(screen.getByText('Save changes'))
+    fireEvent.click(screen.getByText('Save Changes'))
 
     await waitFor(() => {
       expect(mockUpdateCar).toHaveBeenCalledWith(
@@ -157,7 +157,7 @@ describe('ManualEntry', () => {
     fireEvent.change(screen.getByLabelText('Fuel type'), { target: { value: 'electric' } })
     fireEvent.input(screen.getByLabelText('Nickname'), { target: { value: 'My EV' } })
 
-    const saveButton = screen.getByText('Save car') as HTMLButtonElement
+    const saveButton = screen.getByText('Save Car') as HTMLButtonElement
     expect(saveButton.disabled).toBe(true)
 
     fireEvent.input(screen.getByLabelText('Electricity consumption (kWh/100km)'), {

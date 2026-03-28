@@ -60,9 +60,9 @@ describe('TripHistory', () => {
 
     await waitFor(() => {
       expect(screen.getByText('5')).toBeInTheDocument()
-      expect(screen.getByText('Trips')).toBeInTheDocument()
-      expect(screen.getByText('Total cost')).toBeInTheDocument()
-      expect(screen.getByText('Distance')).toBeInTheDocument()
+      expect(screen.getByText('Total Trips')).toBeInTheDocument()
+      expect(screen.getByText('Total Spent')).toBeInTheDocument()
+      expect(screen.getByText('Total Dist.')).toBeInTheDocument()
     })
   })
 
@@ -94,7 +94,7 @@ describe('TripHistory', () => {
     render(withQueryProvider(() => <TripHistory />))
 
     await waitFor(() => {
-      expect(screen.getByText('Clear history')).toBeInTheDocument()
+      expect(screen.getByText('Clear History')).toBeInTheDocument()
     })
   })
 
@@ -107,13 +107,13 @@ describe('TripHistory', () => {
     render(withQueryProvider(() => <TripHistory />))
 
     await waitFor(() => {
-      expect(screen.getByText('Clear history')).toBeInTheDocument()
+      expect(screen.getByText('Clear History')).toBeInTheDocument()
     })
 
     mockGetRecentTrips.mockResolvedValue([])
     mockGetTripStats.mockResolvedValue({ totalTrips: 0, totalCost: 0, totalDistanceKm: 0 })
 
-    fireEvent.click(screen.getByText('Clear history'))
+    fireEvent.click(screen.getByText('Clear History'))
     expect(confirmSpy).toHaveBeenCalledWith('Clear all trip history?')
 
     await waitFor(() => {

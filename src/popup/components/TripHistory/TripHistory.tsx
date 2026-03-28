@@ -52,6 +52,33 @@ export const TripHistory: Component = () => {
     return t.length > 0 ? t[0].currency : 'AUD'
   }
 
+  const fuelIcon = (fuelType: string): string => {
+    switch (fuelType) {
+      case 'electric':
+        return 'bolt'
+      case 'diesel':
+        return 'oil_barrel'
+      default:
+        return 'local_gas_station'
+    }
+  }
+
+  const fuelLabel = (fuelType: string): string => {
+    const labels: Record<string, string> = {
+      petrol: 'Petrol',
+      diesel: 'Diesel',
+      hybrid: 'Hybrid',
+      phev: 'PHEV',
+      electric: 'Electric',
+    }
+    return labels[fuelType] ?? fuelType
+  }
+
+  const fuelVariantKey = (fuelType: string): keyof typeof s.fuelChipVariant =>
+    fuelType in s.fuelChipVariant
+      ? (fuelType as keyof typeof s.fuelChipVariant)
+      : 'petrol'
+
   return (
     <Show when={!loading()} fallback={<div class={s.container}>Loading...</div>}>
       <div class={s.container}>
@@ -64,40 +91,78 @@ export const TripHistory: Component = () => {
           }
         >
           <div class={s.statsGrid}>
-            <div class={s.statCard}>
-              <span class={s.statValue}>{stats().totalTrips}</span>
-              <span class={s.statLabel}>Trips</span>
+            <div class={`${s.statCard} ${s.statCardPrimary}`}>
+              <span class={s.statLabel}>Total Trips</span>
+              <span class={`${s.statValue} ${s.statValuePrimary}`}>{stats().totalTrips}</span>
             </div>
-            <div class={s.statCard}>
-              <span class={s.statValue}>{formatCost(stats().totalCost, defaultCurrency())}</span>
-              <span class={s.statLabel}>Total cost</span>
+            <div class={`${s.statCard} ${s.statCardSecondary}`}>
+              <span class={s.statLabel}>Total Spent</span>
+              <span class={`${s.statValue} ${s.statValueSecondary}`}>
+                {formatCost(stats().totalCost, defaultCurrency())}
+              </span>
             </div>
-            <div class={s.statCard}>
-              <span class={s.statValue}>{formatDistance(stats().totalDistanceKm)}</span>
-              <span class={s.statLabel}>Distance</span>
+            <div class={`${s.statCard} ${s.statCardTertiary}`}>
+              <span class={s.statLabel}>Total Dist.</span>
+              <span class={`${s.statValue} ${s.statValueTertiary}`}>
+                {stats().totalDistanceKm < 1
+                  ? `${Math.round(stats().totalDistanceKm * 1000)}`
+                  : stats().totalDistanceKm.toFixed(1)}
+                <span class={s.statUnit}>
+                  {stats().totalDistanceKm < 1 ? 'm' : 'km'}
+                </span>
+              </span>
             </div>
           </div>
 
-          <div class={s.headerRow}>
-            <span class={s.sectionLabel}>Recent trips</span>
+          <div class={s.sectionHeader}>
+            <div>
+              <h3 class={s.sectionTitle}>Recent Activity</h3>
+              <p class={s.sectionSubtitle}>Your kinetic footprint</p>
+            </div>
             <button class={s.clearButton} onClick={handleClear}>
-              Clear history
+              <span class={`material-symbols-outlined ${s.iconSm}`}>
+                delete_sweep
+              </span>
+              Clear History
             </button>
           </div>
 
           <div class={s.tripList}>
             <For each={trips()}>
-              {(trip: TripRecord) => (
-                <div class={s.tripItem}>
-                  <div class={s.tripDetails}>
-                    <span class={s.tripCar}>{trip.carNickname}</span>
-                    <span class={s.tripMeta}>
-                      {formatDistance(trip.distanceKm)} · {formatDate(trip.timestamp)}
-                    </span>
+              {(trip: TripRecord) => {
+                const variant = fuelVariantKey(trip.fuelType)
+                return (
+                  <div class={s.tripCard}>
+                    <div class={s.tripCardTop}>
+                      <div class={s.tripCardLeft}>
+                        <div class={`${s.tripIcon} ${s.tripIconVariant[variant]}`}>
+                          <span class={`material-symbols-outlined ${s.tripIconTextVariant[variant]}`}>
+                            {fuelIcon(trip.fuelType)}
+                          </span>
+                        </div>
+                        <div class={s.tripInfo}>
+                          <span class={s.tripCarName}>{trip.carNickname}</span>
+                          <span class={s.tripDate}>{formatDate(trip.timestamp)}</span>
+                        </div>
+                      </div>
+                      <div class={s.tripCostSection}>
+                        <div class={s.tripCost}>{formatCost(trip.fuelCost, trip.currency)}</div>
+                      </div>
+                    </div>
+                    <div class={s.tripCardBottom}>
+                      <span class={s.tripMeta}>
+                        <span class={`material-symbols-outlined ${s.iconSm}`}>
+                          route
+                        </span>
+                        {formatDistance(trip.distanceKm)}
+                      </span>
+                      <span class={`${s.fuelChip} ${s.fuelChipVariant[variant]}`}>
+                        {fuelLabel(trip.fuelType).toUpperCase()}
+                      </span>
+                    </div>
                   </div>
-                  <span class={s.tripCost}>{formatCost(trip.fuelCost, trip.currency)}</span>
-                </div>
-              )}
+                )
+              }}
             </For>
           </div>
         </Show>
