@@ -1,5 +1,5 @@
-import { fetchFuelPrices } from '../utils/fuelPrices/fuelPrices'
-import { getAppState, updateFuelPrices } from '../utils/storage/storage'
+import { fetchFuelPrices } from '@utils/fuelPrices/fuelPrices'
+import { getAppState, updateFuelPrices } from '@utils/storage/storage'
 
 const ALARM_NAME = 'refreshFuelPrices'
 

@@ -1,8 +1,8 @@
 import { createSignal, onMount, For, Show, type Component } from 'solid-js'
 import * as s from './Home.css'
-import { getAppState, setActiveCarId } from '../../../utils/storage/storage'
-import { MAX_FREE_CARS, type AppState, type CarProfile } from '../../../utils/types/types'
-import { formatCost } from '../../../utils/calculator/calculator'
+import { getAppState, setActiveCarId } from '@utils/storage/storage'
+import { MAX_FREE_CARS, type AppState, type CarProfile } from '@utils/types/types'
+import { formatCost } from '@utils/calculator/calculator'
 
 interface HomeProps {
   onAddCar: () => void

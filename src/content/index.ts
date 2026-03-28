@@ -3,8 +3,8 @@ import {
   calcTripCost,
   convertDistance,
   formatCost,
-} from '../utils/calculator/calculator'
-import { AVERAGE_CAR_ID, type AppState } from '../utils/types/types'
+} from '@utils/calculator/calculator'
+import { AVERAGE_CAR_ID, type AppState } from '@utils/types/types'
 import injectedCss from './injected.css?inline'
 
 const FUEL_COST_HOST_ATTR = 'data-fuel-cost-host'

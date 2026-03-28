@@ -1,11 +1,11 @@
 import { createSignal, Match, Switch, type Component } from 'solid-js'
 import { themeClass } from './styles/theme.css'
 import './styles/global.css'
-import type { PopupView } from '../utils/types/types'
-import Header from './components/Header/Header'
-import Home from './components/Home/Home'
-import CarSearch from './components/CarSearch/CarSearch'
-import Settings from './components/Settings/Settings'
+import type { PopupView } from '@utils/types/types'
+import Header from '@components/Header/Header'
+import Home from '@components/Home/Home'
+import CarSearch from '@components/CarSearch/CarSearch'
+import Settings from '@components/Settings/Settings'
 
 const App: Component = () => {
   const [view, setView] = createSignal<PopupView>({ kind: 'home' })

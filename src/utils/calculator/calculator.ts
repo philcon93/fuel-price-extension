@@ -1,4 +1,4 @@
-import type { CarProfile, Currency, FuelPrices, FuelType } from '../types/types'
+import type { CarProfile, Currency, FuelPrices, FuelType } from '@utils/types/types'
 
 const KM_PER_MILE = 1.60934
 const CHARGING_EFFICIENCY = 0.88

@@ -4,9 +4,9 @@ import {
   convertDistance,
   calcTripCost,
   formatCost,
-} from '../utils/calculator/calculator'
-import { AVERAGE_CAR_ID } from '../utils/types/types'
-import type { CarProfile, FuelPrices, AppState } from '../utils/types/types'
+} from '@utils/calculator/calculator'
+import { AVERAGE_CAR_ID } from '@utils/types/types'
+import type { CarProfile, FuelPrices, AppState } from '@utils/types/types'
 
 describe('content script logic', () => {
   const prices: FuelPrices = {
