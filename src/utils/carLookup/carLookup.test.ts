@@ -68,28 +68,12 @@ describe('searchCars', () => {
     expect(results).toEqual([])
   })
 
-  it('sends message to background and groups results', async () => {
+  it('sends message to background and returns model list', async () => {
     const mock = getChromeMock()
     mock.runtime.sendMessage.mockResolvedValueOnce({
       Models: [
-        {
-          model_name: 'Corolla',
-          model_make_display: 'Toyota',
-          model_year: '2023',
-          model_trim: 'LE',
-        },
-        {
-          model_name: 'Corolla',
-          model_make_display: 'Toyota',
-          model_year: '2023',
-          model_trim: 'SE',
-        },
-        {
-          model_name: 'Camry',
-          model_make_display: 'Toyota',
-          model_year: '2023',
-          model_trim: 'XLE',
-        },
+        { model_name: 'Corolla', model_make_id: 'Toyota' },
+        { model_name: 'Camry', model_make_id: 'Toyota' },
       ],
     })
 
@@ -104,9 +88,30 @@ describe('searchCars', () => {
     expect(results[0]).toEqual({
       makeDisplay: 'Toyota',
       modelName: 'Corolla',
-      modelYear: 2023,
-      trimCount: 2,
+      modelYear: undefined,
     })
+    expect(results[1]).toEqual({
+      makeDisplay: 'Toyota',
+      modelName: 'Camry',
+      modelYear: undefined,
+    })
+  })
+
+  it('includes year in results when parsed from query', async () => {
+    const mock = getChromeMock()
+    mock.runtime.sendMessage.mockResolvedValueOnce({
+      Models: [{ model_name: 'Corolla', model_make_id: 'Toyota' }],
+    })
+
+    const results = await searchCars('toyota corolla 2020')
+
+    expect(mock.runtime.sendMessage).toHaveBeenCalledWith({
+      type: 'CAR_QUERY_FETCH',
+      url: expect.stringContaining('year=2020'),
+    })
+
+    expect(results).toHaveLength(1)
+    expect(results[0].modelYear).toBe(2020)
   })
 
   it('returns empty when API returns no Models', async () => {
@@ -121,18 +126,8 @@ describe('searchCars', () => {
     const mock = getChromeMock()
     mock.runtime.sendMessage.mockResolvedValueOnce({
       Models: [
-        {
-          model_name: 'Corolla',
-          model_make_display: 'Toyota',
-          model_year: '2023',
-          model_trim: 'LE',
-        },
-        {
-          model_name: 'Camry',
-          model_make_display: 'Toyota',
-          model_year: '2023',
-          model_trim: 'SE',
-        },
+        { model_name: 'Corolla', model_make_id: 'Toyota' },
+        { model_name: 'Camry', model_make_id: 'Toyota' },
       ],
     })
 
@@ -158,7 +153,7 @@ describe('getTrims', () => {
           model_id: '123',
           model_make_display: 'Toyota',
           model_name: 'Corolla',
-          model_year: '2023',
+          model_year: '2020',
           model_trim: 'LE',
           model_engine_cc: '1800',
           model_engine_fuel: 'Gasoline',
@@ -172,11 +167,11 @@ describe('getTrims', () => {
       ],
     })
 
-    const trims = await getTrims('Toyota', 'Corolla', 2023)
+    const trims = await getTrims('Toyota', 'Corolla', 2020)
 
     expect(mock.runtime.sendMessage).toHaveBeenCalledWith({
       type: 'CAR_QUERY_FETCH',
-      url: expect.stringContaining('cmd=getTrims&make=Toyota&model=Corolla&year=2023'),
+      url: expect.stringContaining('cmd=getTrims&make=Toyota&model=Corolla&year=2020'),
     })
 
     expect(trims).toHaveLength(1)
@@ -184,7 +179,7 @@ describe('getTrims', () => {
       modelId: '123',
       makeDisplay: 'Toyota',
       modelName: 'Corolla',
-      modelYear: 2023,
+      modelYear: 2020,
       modelTrim: 'LE',
       modelEngineCC: 1800,
       modelEngineFuel: 'Gasoline',
@@ -197,11 +192,23 @@ describe('getTrims', () => {
     })
   })
 
+  it('fetches without year when not provided', async () => {
+    const mock = getChromeMock()
+    mock.runtime.sendMessage.mockResolvedValueOnce({ Trims: [] })
+
+    await getTrims('Toyota', 'Corolla')
+
+    expect(mock.runtime.sendMessage).toHaveBeenCalledWith({
+      type: 'CAR_QUERY_FETCH',
+      url: expect.not.stringContaining('year='),
+    })
+  })
+
   it('returns empty array when no trims found', async () => {
     const mock = getChromeMock()
     mock.runtime.sendMessage.mockResolvedValueOnce({})
 
-    const trims = await getTrims('Toyota', 'Corolla', 2023)
+    const trims = await getTrims('Toyota', 'Corolla', 2020)
     expect(trims).toEqual([])
   })
 })

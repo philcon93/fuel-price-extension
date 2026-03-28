@@ -5,8 +5,7 @@ const API_BASE = 'https://www.carqueryapi.com/api/0.3/'
 export interface CarResult {
   makeDisplay: string
   modelName: string
-  modelYear: number
-  trimCount: number
+  modelYear?: number
 }
 
 interface ParsedQuery {
@@ -59,61 +58,43 @@ export async function searchCars(query: string): Promise<CarResult[]> {
 
   let params = `cmd=getModels&make=${encodeURIComponent(parsed.make)}`
   if (parsed.year) params += `&year=${parsed.year}`
-  if (parsed.model) params += `&model=${encodeURIComponent(parsed.model)}`
 
   const data = (await fetchCarQuery(params)) as {
     Models?: Array<{
       model_name: string
-      model_make_display: string
-      model_year: string
-      model_trim: string
+      model_make_id: string
     }>
   }
 
   if (!data.Models) return []
 
-  const grouped = new Map<string, CarResult>()
-
-  for (const m of data.Models) {
-    const key = `${m.model_make_display}|${m.model_name}|${m.model_year}`
-    const existing = grouped.get(key)
-    if (existing) {
-      existing.trimCount++
-    } else {
-      grouped.set(key, {
-        makeDisplay: m.model_make_display,
-        modelName: m.model_name,
-        modelYear: parseInt(m.model_year),
-        trimCount: 1,
-      })
-    }
-  }
-
-  let results = Array.from(grouped.values())
+  let results: CarResult[] = data.Models.map((m) => ({
+    makeDisplay: m.model_make_id,
+    modelName: m.model_name,
+    modelYear: parsed.year,
+  }))
 
   if (parsed.model) {
     const modelLower = parsed.model.toLowerCase()
     results = results.filter((r) => r.modelName.toLowerCase().includes(modelLower))
   }
 
-  if (parsed.year) {
-    results = results.filter((r) => r.modelYear === parsed.year)
-  }
-
   return results.slice(0, 20)
 }
 
-export async function getTrims(make: string, model: string, year: number): Promise<CarQueryTrim[]> {
-  const params = `cmd=getTrims&make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&year=${year}`
+export async function getTrims(make: string, model: string, year?: number): Promise<CarQueryTrim[]> {
+  let params = `cmd=getTrims&make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}`
+  if (year) params += `&year=${year}`
+
   const data = (await fetchCarQuery(params)) as { Trims?: Array<Record<string, string>> }
 
   if (!data.Trims) return []
 
   return data.Trims.map((t) => ({
     modelId: t.model_id || '',
-    makeDisplay: t.model_make_display || make,
+    makeDisplay: t.model_make_display || t.make_display || make,
     modelName: t.model_name || model,
-    modelYear: parseInt(t.model_year) || year,
+    modelYear: parseInt(t.model_year) || 0,
     modelTrim: t.model_trim || '',
     modelEngineCC: parseFloat(t.model_engine_cc) || 0,
     modelEngineFuel: t.model_engine_fuel || '',
