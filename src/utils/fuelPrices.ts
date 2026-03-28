@@ -77,7 +77,7 @@ export async function fetchFuelPrices(forceRefresh = false): Promise<FuelPrices>
 async function getCachedPrices(): Promise<FuelPrices | null> {
   try {
     const result = await chrome.storage.local.get(CACHE_KEY)
-    return result[CACHE_KEY] ?? null
+    return (result[CACHE_KEY] as FuelPrices) ?? null
   } catch {
     return null
   }

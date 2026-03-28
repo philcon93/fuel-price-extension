@@ -51,15 +51,16 @@ async function fetchJsonp(url: string): Promise<unknown> {
 
   return new Promise((resolve, reject) => {
     const script = document.createElement('script')
-    ;(window as Record<string, unknown>)[callbackName] = (data: unknown) => {
+    const w = window as unknown as Record<string, unknown>
+    w[callbackName] = (data: unknown) => {
       resolve(data)
       script.remove()
-      delete (window as Record<string, unknown>)[callbackName]
+      delete w[callbackName]
     }
     script.onerror = () => {
       reject(new Error('JSONP request failed'))
       script.remove()
-      delete (window as Record<string, unknown>)[callbackName]
+      delete w[callbackName]
     }
     script.src = fullUrl
     document.head.appendChild(script)
