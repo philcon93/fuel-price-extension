@@ -1,5 +1,10 @@
-import { parseDistanceText, calcTripCost, convertDistance, formatCost } from '../utils/calculator'
-import { AVERAGE_CAR_ID, type AppState } from '../utils/types'
+import {
+  parseDistanceText,
+  calcTripCost,
+  convertDistance,
+  formatCost,
+} from '../utils/calculator/calculator'
+import { AVERAGE_CAR_ID, type AppState } from '../utils/types/types'
 import injectedCss from './injected.css?inline'
 
 const FUEL_COST_HOST_ATTR = 'data-fuel-cost-host'

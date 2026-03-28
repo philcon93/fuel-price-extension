@@ -7,7 +7,7 @@ import {
   formatCost,
   parseDistanceText,
 } from './calculator'
-import type { CarProfile, FuelPrices } from './types'
+import type { CarProfile, FuelPrices } from '../types/types'
 
 const petrolCar: CarProfile = {
   id: 'test-petrol',

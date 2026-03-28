@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { resetChromeStores } from '../test-setup'
+import { resetChromeStores } from '../../test-setup'
 import {
   getAppState,
   setActiveCarId,
@@ -9,7 +9,7 @@ import {
   updateSettings,
   updateFuelPrices,
 } from './storage'
-import { AVERAGE_CAR_ID, type FuelPrices } from './types'
+import { AVERAGE_CAR_ID, type FuelPrices } from '../types/types'
 
 beforeEach(() => {
   resetChromeStores()

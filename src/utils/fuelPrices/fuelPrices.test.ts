@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { resetChromeStores, getChromeMock } from '../test-setup'
+import { resetChromeStores, getChromeMock } from '../../test-setup'
 import { fetchFuelPrices } from './fuelPrices'
 
 beforeEach(() => {

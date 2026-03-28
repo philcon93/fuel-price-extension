@@ -1,14 +1,14 @@
 import { createSignal, onMount, Show, type Component } from 'solid-js'
 import * as s from './Settings.css'
-import { getAppState, updateSettings, updateFuelPrices } from '../../../utils/storage'
+import { getAppState, updateSettings, updateFuelPrices } from '../../../utils/storage/storage'
 import {
   AVERAGE_CAR_ID,
   type AppState,
   type Currency,
   type DistanceUnit,
   type EfficiencyUnit,
-} from '../../../utils/types'
-import { fetchFuelPrices } from '../../../utils/fuelPrices'
+} from '../../../utils/types/types'
+import { fetchFuelPrices } from '../../../utils/fuelPrices/fuelPrices'
 
 interface SettingsProps {
   onBack: () => void

@@ -1,7 +1,7 @@
 import { createSignal, onMount, For, Show, type Component } from 'solid-js'
 import * as s from './TrimPicker.css'
-import { getTrims } from '../../../utils/carLookup'
-import type { CarQueryTrim } from '../../../utils/types'
+import { getTrims } from '../../../utils/carLookup/carLookup'
+import type { CarQueryTrim } from '../../../utils/types/types'
 
 interface TrimPickerProps {
   make: string
