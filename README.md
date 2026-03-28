@@ -15,6 +15,8 @@ When you plan a route on Google Maps, this extension reads the distance and calc
 - **Multiple car profiles** — save up to 2 cars (free tier) and switch between them
 - **Average car comparison** — see how your car stacks up against the fleet average
 - **No manual fuel price entry** — per-country averages built in, refreshed daily
+- **Trip history** — every calculated fuel cost is recorded locally so you can review past trips, total spend, and distance
+- **Privacy-respecting analytics** — optional anonymous usage analytics via PostHog with a one-click opt-out in Settings
 
 ## For end users
 
@@ -39,6 +41,16 @@ The extension works immediately with an "Average Car" profile based on your regi
 
 You can also enter specs manually if your car isn't in the database.
 
+### Trip history
+
+Every fuel cost the extension calculates is stored locally in your browser. Open the popup and click **Trip history** to see:
+
+- Total trips, distance, and cost
+- A list of recent calculations with car name, distance, and cost
+- A button to clear your history
+
+No trip data leaves your device — it's stored in IndexedDB in the extension's context.
+
 ### Settings
 
 - **Distance units** — km or miles
@@ -46,6 +58,7 @@ You can also enter specs manually if your car isn't in the database.
 - **Currency** — AUD, USD, GBP, EUR, NZD, CAD, INR, JPY
 - **Show average comparison** — display the average car cost alongside your car's cost
 - **Fuel prices** — auto-detected per region, manually overridable
+- **Disable anonymous analytics** — opt out of anonymous usage data collection
 
 ## For developers
 
@@ -82,6 +95,19 @@ pnpm install
 3. Click **Load Unpacked** and select the `dist/` folder
 4. For content/background script changes, click the refresh icon on the extension card
 
+### Analytics setup
+
+The extension supports optional PostHog analytics. To enable it, create a `.env` file in the project root:
+
+```env
+VITE_POSTHOG_KEY=phc_your_key_here
+VITE_POSTHOG_HOST=https://us.i.posthog.com
+```
+
+Without a PostHog key, all analytics calls are no-ops. Users can also disable analytics in the extension's Settings panel.
+
+**Events tracked:** popup opens, car additions (manual vs lookup), search queries (length and result count only), settings changes, fuel cost calculations (bucketed distance ranges — no exact locations or PII).
+
 ### Tech stack
 
 | Layer              | Technology                                                        |
@@ -91,7 +117,9 @@ pnpm install
 | Styling            | Vanilla Extract (popup), plain CSS in Shadow DOM (content script) |
 | Language           | TypeScript                                                        |
 | Extension standard | Chrome Manifest V3                                                |
-| Testing            | Vitest                                                            |
+| Testing            | Vitest + @solidjs/testing-library + @testing-library/jest-dom     |
+| Local storage      | chrome.storage (state), IndexedDB via Dexie.js (trip history)     |
+| Analytics          | PostHog (optional, with user opt-out)                             |
 | Linting            | ESLint with typescript-eslint + eslint-plugin-solid               |
 | Formatting         | Prettier                                                          |
 
@@ -99,25 +127,29 @@ pnpm install
 
 ```
 src/
-  popup/              # Extension popup UI (SolidJS)
-    components/       # Each component in its own directory
+  popup/                  # Extension popup UI (SolidJS)
+    components/           # Each component in its own directory
       Header/
       Home/
       CarSearch/
       TrimPicker/
       ManualEntry/
       Settings/
-    styles/           # Vanilla Extract theme and global styles
-  content/            # Content script injected into Google Maps
-  background/         # Service worker for alarms and message passing
-  utils/              # Shared utilities
-    calculator.ts     # Pure fuel cost calculation functions
-    carLookup.ts      # CarQuery API integration
-    fuelPrices.ts     # Per-country fuel price data and caching
-    storage.ts        # chrome.storage helpers
-    types.ts          # Shared TypeScript interfaces
-    __tests__/        # Unit tests
+      TripHistory/
+    styles/               # Vanilla Extract theme and global styles
+  content/                # Content script injected into Google Maps
+  background/             # Service worker for alarms and message passing
+  utils/                  # Shared utilities (each in its own directory)
+    analytics/            # PostHog analytics wrapper with opt-out
+    calculator/           # Pure fuel cost calculation functions
+    carLookup/            # CarQuery API integration (via background fetch)
+    fuelPrices/           # Per-country fuel price data and caching
+    storage/              # chrome.storage helpers
+    tripHistory/          # IndexedDB trip recording via Dexie.js
+    types/                # Shared TypeScript interfaces
 ```
+
+Tests are co-located as siblings (e.g. `calculator.test.ts` next to `calculator.ts`). Path aliases `@utils/*` and `@components/*` are configured in `tsconfig.json`, `vite.config.ts`, and `vitest.config.ts`.
 
 ## License
 
