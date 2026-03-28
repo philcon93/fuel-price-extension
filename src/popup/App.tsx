@@ -13,10 +13,14 @@ const App: Component = () => {
   const title = () => {
     const v = view()
     switch (v.kind) {
-      case 'home': return 'Fuel Cost'
-      case 'addCar': return 'Add a car'
-      case 'editCar': return 'Edit car'
-      case 'settings': return 'Settings'
+      case 'home':
+        return 'Fuel Cost'
+      case 'addCar':
+        return 'Add a car'
+      case 'editCar':
+        return 'Edit car'
+      case 'settings':
+        return 'Settings'
     }
   }
 
@@ -41,7 +45,11 @@ const App: Component = () => {
         </Match>
         <Match when={view().kind === 'addCar' || view().kind === 'editCar'}>
           <CarSearch
-            editCarId={view().kind === 'editCar' ? (view() as { kind: 'editCar'; carId: string }).carId : undefined}
+            editCarId={
+              view().kind === 'editCar'
+                ? (view() as { kind: 'editCar'; carId: string }).carId
+                : undefined
+            }
             onDone={() => setView({ kind: 'home' })}
           />
         </Match>

@@ -26,16 +26,28 @@ const FLEET_AVERAGES: Record<string, number> = {
 }
 const DEFAULT_L100KM = 10.0
 
-function detectLocaleInfo(): { currency: Currency; distanceUnit: DistanceUnit; countryCode: string } {
+function detectLocaleInfo(): {
+  currency: Currency
+  distanceUnit: DistanceUnit
+  countryCode: string
+} {
   try {
     const locale = Intl.NumberFormat().resolvedOptions().locale || navigator.language || 'en-US'
     const parts = locale.split('-')
     const country = (parts[parts.length - 1] || 'US').toUpperCase()
 
     const currencyMap: Record<string, Currency> = {
-      AU: 'AUD', US: 'USD', GB: 'GBP', NZ: 'NZD', CA: 'CAD',
-      DE: 'EUR', FR: 'EUR', IT: 'EUR', ES: 'EUR',
-      IN: 'INR', JP: 'JPY',
+      AU: 'AUD',
+      US: 'USD',
+      GB: 'GBP',
+      NZ: 'NZD',
+      CA: 'CAD',
+      DE: 'EUR',
+      FR: 'EUR',
+      IT: 'EUR',
+      ES: 'EUR',
+      IN: 'INR',
+      JP: 'JPY',
     }
 
     const milesCountries = new Set(['US', 'GB'])
@@ -67,9 +79,9 @@ function createDefaultState(): AppState {
   }
 
   const defaultPrices: FuelPrices = {
-    petrolPerLitre: 1.80,
-    dieselPerLitre: 1.90,
-    electricityPerKwh: 0.30,
+    petrolPerLitre: 1.8,
+    dieselPerLitre: 1.9,
+    electricityPerKwh: 0.3,
     currency: locale.currency,
     lastUpdated: 0,
     source: 'Default estimates',
@@ -94,7 +106,7 @@ export async function getAppState(): Promise<AppState> {
   const result = await chrome.storage.sync.get(STORAGE_KEY)
   if (result[STORAGE_KEY]) {
     const state = result[STORAGE_KEY] as AppState
-    if (!state.cars.find(c => c.id === AVERAGE_CAR_ID)) {
+    if (!state.cars.find((c) => c.id === AVERAGE_CAR_ID)) {
       const defaultState = createDefaultState()
       state.cars.unshift(defaultState.cars[0])
     }
@@ -111,7 +123,7 @@ async function saveAppState(state: AppState): Promise<void> {
 
 export async function setActiveCarId(carId: string): Promise<void> {
   const state = await getAppState()
-  if (state.cars.find(c => c.id === carId)) {
+  if (state.cars.find((c) => c.id === carId)) {
     state.activeCarId = carId
     await saveAppState(state)
   }
@@ -129,9 +141,12 @@ export async function addCar(profile: Omit<CarProfile, 'id'>): Promise<CarProfil
   return car
 }
 
-export async function updateCar(carId: string, updates: Partial<Omit<CarProfile, 'id'>>): Promise<void> {
+export async function updateCar(
+  carId: string,
+  updates: Partial<Omit<CarProfile, 'id'>>,
+): Promise<void> {
   const state = await getAppState()
-  const idx = state.cars.findIndex(c => c.id === carId)
+  const idx = state.cars.findIndex((c) => c.id === carId)
   if (idx === -1 || state.cars[idx].isLocked) return
   state.cars[idx] = { ...state.cars[idx], ...updates }
   await saveAppState(state)
@@ -139,9 +154,9 @@ export async function updateCar(carId: string, updates: Partial<Omit<CarProfile,
 
 export async function removeCar(carId: string): Promise<void> {
   const state = await getAppState()
-  const car = state.cars.find(c => c.id === carId)
+  const car = state.cars.find((c) => c.id === carId)
   if (!car || car.isLocked) return
-  state.cars = state.cars.filter(c => c.id !== carId)
+  state.cars = state.cars.filter((c) => c.id !== carId)
   if (state.activeCarId === carId) {
     state.activeCarId = AVERAGE_CAR_ID
   }

@@ -19,7 +19,7 @@ const Home: Component<HomeProps> = (props) => {
   })
 
   const activeCar = (): CarProfile | undefined =>
-    state()?.cars.find(c => c.id === state()?.activeCarId)
+    state()?.cars.find((c) => c.id === state()?.activeCarId)
 
   const carSummaryText = (car: CarProfile): string => {
     if (car.isDefault) return 'Fleet average for your region'
@@ -42,7 +42,7 @@ const Home: Component<HomeProps> = (props) => {
   const handleAddCar = () => {
     const s = state()
     if (!s) return
-    const customCars = s.cars.filter(c => !c.isDefault).length
+    const customCars = s.cars.filter((c) => !c.isDefault).length
     if (customCars >= MAX_FREE_CARS) {
       alert('Upgrade to Pro for unlimited car profiles')
       return
@@ -85,7 +85,7 @@ const Home: Component<HomeProps> = (props) => {
                     <button
                       class={s.addCarLink}
                       onClick={() => props.onEditCar(car().id)}
-                      style={{ display: 'inline', "font-size": 'inherit' }}
+                      style={{ display: 'inline', 'font-size': 'inherit' }}
                     >
                       Edit
                     </button>
@@ -97,7 +97,12 @@ const Home: Component<HomeProps> = (props) => {
 
           <button class={s.addCarLink} onClick={handleAddCar}>
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M7 1V13M1 7H13" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              <path
+                d="M7 1V13M1 7H13"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
             </svg>
             Add a car
           </button>
@@ -120,12 +125,17 @@ const Home: Component<HomeProps> = (props) => {
               <div class={s.priceCard}>
                 <span class={s.priceLabel}>Electric</span>
                 <span class={s.priceValue}>
-                  {formatPrice(appState().fuelPrices.electricityPerKwh, appState().settings.currency)}/kWh
+                  {formatPrice(
+                    appState().fuelPrices.electricityPerKwh,
+                    appState().settings.currency,
+                  )}
+                  /kWh
                 </span>
               </div>
             </div>
             <span class={s.lastUpdated}>
-              {appState().fuelPrices.source} · Updated {formatLastUpdated(appState().fuelPrices.lastUpdated)}
+              {appState().fuelPrices.source} · Updated{' '}
+              {formatLastUpdated(appState().fuelPrices.lastUpdated)}
             </span>
           </div>
         </div>

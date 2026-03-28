@@ -1,7 +1,13 @@
 import { createSignal, onMount, Show, type Component } from 'solid-js'
 import * as s from './Settings.css'
 import { getAppState, updateSettings, updateFuelPrices } from '../../../utils/storage'
-import { AVERAGE_CAR_ID, type AppState, type Currency, type DistanceUnit, type EfficiencyUnit } from '../../../utils/types'
+import {
+  AVERAGE_CAR_ID,
+  type AppState,
+  type Currency,
+  type DistanceUnit,
+  type EfficiencyUnit,
+} from '../../../utils/types'
 import { fetchFuelPrices } from '../../../utils/fuelPrices'
 
 interface SettingsProps {
@@ -53,7 +59,10 @@ const Settings: Component<SettingsProps> = () => {
     }
   }
 
-  const handlePriceChange = async (field: 'petrolPerLitre' | 'dieselPerLitre' | 'electricityPerKwh', value: string) => {
+  const handlePriceChange = async (
+    field: 'petrolPerLitre' | 'dieselPerLitre' | 'electricityPerKwh',
+    value: string,
+  ) => {
     const num = parseFloat(value)
     if (isNaN(num) || num < 0) return
     const current = state()?.fuelPrices
@@ -140,7 +149,9 @@ const Settings: Component<SettingsProps> = () => {
                 disabled={isAverageActive()}
                 aria-label="Toggle average comparison"
               >
-                <div class={`${s.toggleKnob} ${appState().settings.showAverageComparison && !isAverageActive() ? s.toggleKnobActive : ''}`} />
+                <div
+                  class={`${s.toggleKnob} ${appState().settings.showAverageComparison && !isAverageActive() ? s.toggleKnobActive : ''}`}
+                />
               </button>
             </div>
             <Show when={isAverageActive()}>
@@ -185,7 +196,8 @@ const Settings: Component<SettingsProps> = () => {
             </div>
             <div class={s.row}>
               <span class={s.lastUpdated}>
-                {appState().fuelPrices.source} · {formatLastUpdated(appState().fuelPrices.lastUpdated)}
+                {appState().fuelPrices.source} ·{' '}
+                {formatLastUpdated(appState().fuelPrices.lastUpdated)}
               </span>
               <button class={s.refreshButton} onClick={handleRefreshPrices} disabled={refreshing()}>
                 {refreshing() ? 'Refreshing...' : 'Refresh'}

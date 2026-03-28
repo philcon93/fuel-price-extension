@@ -20,8 +20,8 @@ const CarSearch: Component<CarSearchProps> = (props) => {
   const [editCar, setEditCar] = createSignal<CarProfile | null>(null)
 
   if (props.editCarId) {
-    getAppState().then(state => {
-      const car = state.cars.find(c => c.id === props.editCarId)
+    getAppState().then((state) => {
+      const car = state.cars.find((c) => c.id === props.editCarId)
       if (car) setEditCar(car)
     })
   }
@@ -65,7 +65,9 @@ const CarSearch: Component<CarSearchProps> = (props) => {
       fuelType: mapFuelType(trim.modelEngineFuel),
       engineSizeL: trim.modelEngineCC ? trim.modelEngineCC / 1000 : undefined,
       officialL100km: trim.modelLkm_mixed ?? trim.modelLkm_hwy,
-      realWorldL100km: trim.modelLkm_mixed ? Math.round(trim.modelLkm_mixed * 1.15 * 10) / 10 : undefined,
+      realWorldL100km: trim.modelLkm_mixed
+        ? Math.round(trim.modelLkm_mixed * 1.15 * 10) / 10
+        : undefined,
       useRealWorld: true,
       isManual: false,
     }
@@ -102,9 +104,12 @@ const CarSearch: Component<CarSearchProps> = (props) => {
               <For each={results()}>
                 {(result) => (
                   <button class={s.resultItem} onClick={() => handleSelectResult(result)}>
-                    <div class={s.resultTitle}>{result.makeDisplay} {result.modelName}</div>
+                    <div class={s.resultTitle}>
+                      {result.makeDisplay} {result.modelName}
+                    </div>
                     <div class={s.resultMeta}>
-                      {result.modelYear} · {result.trimCount} trim{result.trimCount !== 1 ? 's' : ''}
+                      {result.modelYear} · {result.trimCount} trim
+                      {result.trimCount !== 1 ? 's' : ''}
                     </div>
                   </button>
                 )}
@@ -135,10 +140,7 @@ const CarSearch: Component<CarSearchProps> = (props) => {
       </Show>
 
       <Show when={showManual() || props.editCarId}>
-        <ManualEntry
-          existingCar={editCar() ?? undefined}
-          onSave={props.onDone}
-        />
+        <ManualEntry existingCar={editCar() ?? undefined} onSave={props.onDone} />
         <Show when={props.editCarId}>
           <button class={s.deleteButton} onClick={handleDelete}>
             Delete this car

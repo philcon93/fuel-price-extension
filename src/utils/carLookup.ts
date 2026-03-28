@@ -72,12 +72,14 @@ export async function searchCars(query: string): Promise<CarResult[]> {
   if (parsed.year) url += `&year=${parsed.year}`
   if (parsed.model) url += `&model=${encodeURIComponent(parsed.model)}`
 
-  const data = await fetchJsonp(url) as { Models?: Array<{
-    model_name: string
-    model_make_display: string
-    model_year: string
-    model_trim: string
-  }> }
+  const data = (await fetchJsonp(url)) as {
+    Models?: Array<{
+      model_name: string
+      model_make_display: string
+      model_year: string
+      model_trim: string
+    }>
+  }
 
   if (!data.Models) return []
 
@@ -102,11 +104,11 @@ export async function searchCars(query: string): Promise<CarResult[]> {
 
   if (parsed.model) {
     const modelLower = parsed.model.toLowerCase()
-    results = results.filter(r => r.modelName.toLowerCase().includes(modelLower))
+    results = results.filter((r) => r.modelName.toLowerCase().includes(modelLower))
   }
 
   if (parsed.year) {
-    results = results.filter(r => r.modelYear === parsed.year)
+    results = results.filter((r) => r.modelYear === parsed.year)
   }
 
   return results.slice(0, 20)
@@ -114,11 +116,11 @@ export async function searchCars(query: string): Promise<CarResult[]> {
 
 export async function getTrims(make: string, model: string, year: number): Promise<CarQueryTrim[]> {
   const url = `${API_BASE}?cmd=getTrims&make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&year=${year}`
-  const data = await fetchJsonp(url) as { Trims?: Array<Record<string, string>> }
+  const data = (await fetchJsonp(url)) as { Trims?: Array<Record<string, string>> }
 
   if (!data.Trims) return []
 
-  return data.Trims.map(t => ({
+  return data.Trims.map((t) => ({
     modelId: t.model_id || '',
     makeDisplay: t.model_make_display || make,
     modelName: t.model_name || model,

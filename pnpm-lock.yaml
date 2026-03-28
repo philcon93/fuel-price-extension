@@ -27,6 +27,9 @@ importers:
       '@vanilla-extract/vite-plugin':
         specifier: ^5.2.1
         version: 5.2.1(@types/node@25.5.0)(esbuild@0.27.4)(vite@8.0.3(@types/node@25.5.0)(esbuild@0.27.4))
+      prettier:
+        specifier: ^3.8.1
+        version: 3.8.1
       typescript:
         specifier: ^6.0.2
         version: 6.0.2
@@ -891,6 +894,11 @@ packages:
   postcss@8.5.8:
     resolution: {integrity: sha512-OW/rX8O/jXnm82Ey1k44pObPtdblfiuWnrd8X7GJ7emImCOstunGbXUpp7HdBrFQX6rJzn3sPT397Wp5aCwCHg==, tarball: https://artifactory.workday.com/artifactory/api/npm/npm-virtual/postcss/-/postcss-8.5.8.tgz}
     engines: {node: ^10 || ^12 || >=14}
+
+  prettier@3.8.1:
+    resolution: {integrity: sha512-UOnG6LftzbdaHZcKoPFtOcCKztrQ57WkHDeRD9t/PTQtmT0NHSeWWepj6pS0z/N7+08BHFDQVUrfmfMRcZwbMg==, tarball: https://artifactory.workday.com/artifactory/api/npm/npm-virtual/prettier/-/prettier-3.8.1.tgz}
+    engines: {node: '>=14'}
+    hasBin: true
 
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==, tarball: https://artifactory.workday.com/artifactory/api/npm/npm-virtual/queue-microtask/-/queue-microtask-1.2.3.tgz}
@@ -1865,6 +1873,8 @@ snapshots:
       nanoid: 3.3.11
       picocolors: 1.1.1
       source-map-js: 1.2.1
+
+  prettier@3.8.1: {}
 
   queue-microtask@1.2.3: {}
 

@@ -17,7 +17,7 @@ async function getState(): Promise<AppState | null> {
 }
 
 function removeExistingHosts() {
-  document.querySelectorAll(`[${FUEL_COST_HOST_ATTR}]`).forEach(el => el.remove())
+  document.querySelectorAll(`[${FUEL_COST_HOST_ATTR}]`).forEach((el) => el.remove())
 }
 
 function createFuelCostElement(
@@ -88,7 +88,7 @@ async function processDistanceNode(textNode: Text) {
   if (!state) return
 
   const distanceKm = convertDistance(parsed.value, parsed.unit, 'km')
-  const activeCar = state.cars.find(c => c.id === state.activeCarId)
+  const activeCar = state.cars.find((c) => c.id === state.activeCarId)
   if (!activeCar) return
 
   const cost = calcTripCost(distanceKm, activeCar, state.fuelPrices)
@@ -97,11 +97,8 @@ async function processDistanceNode(textNode: Text) {
   let comparisonCost: string | undefined
   let comparisonLabel: string | undefined
 
-  if (
-    state.settings.showAverageComparison &&
-    state.activeCarId !== AVERAGE_CAR_ID
-  ) {
-    const avgCar = state.cars.find(c => c.id === AVERAGE_CAR_ID)
+  if (state.settings.showAverageComparison && state.activeCarId !== AVERAGE_CAR_ID) {
+    const avgCar = state.cars.find((c) => c.id === AVERAGE_CAR_ID)
     if (avgCar) {
       const avgCostValue = calcTripCost(distanceKm, avgCar, state.fuelPrices)
       comparisonCost = formatCost(avgCostValue, state.settings.currency)
@@ -120,20 +117,16 @@ async function processDistanceNode(textNode: Text) {
 
 function scanForDistances() {
   try {
-    const walker = document.createTreeWalker(
-      document.body,
-      NodeFilter.SHOW_TEXT,
-      {
-        acceptNode: (node) => {
-          const text = node.textContent?.trim() ?? ''
-          if (processedNodes.has(node)) return NodeFilter.FILTER_REJECT
-          if (/^\d[\d,.]*\s*(km|mi|miles?)$/i.test(text)) {
-            return NodeFilter.FILTER_ACCEPT
-          }
-          return NodeFilter.FILTER_REJECT
-        },
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: (node) => {
+        const text = node.textContent?.trim() ?? ''
+        if (processedNodes.has(node)) return NodeFilter.FILTER_REJECT
+        if (/^\d[\d,.]*\s*(km|mi|miles?)$/i.test(text)) {
+          return NodeFilter.FILTER_ACCEPT
+        }
+        return NodeFilter.FILTER_REJECT
       },
-    )
+    })
 
     const nodes: Text[] = []
     let current: Text | null

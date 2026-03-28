@@ -57,9 +57,7 @@ export function calcCost(usage: FuelUsage, prices: FuelPrices, fuelType: FuelTyp
   let cost = 0
 
   if (usage.litres > 0) {
-    const pricePerLitre = fuelType === 'diesel'
-      ? prices.dieselPerLitre
-      : prices.petrolPerLitre
+    const pricePerLitre = fuelType === 'diesel' ? prices.dieselPerLitre : prices.petrolPerLitre
     cost += usage.litres * pricePerLitre
   }
 
@@ -71,11 +69,7 @@ export function calcCost(usage: FuelUsage, prices: FuelPrices, fuelType: FuelTyp
   return Math.round(cost * 100) / 100
 }
 
-export function calcTripCost(
-  distanceKm: number,
-  profile: CarProfile,
-  prices: FuelPrices,
-): number {
+export function calcTripCost(distanceKm: number, profile: CarProfile, prices: FuelPrices): number {
   const usage = calcFuelUsed(distanceKm, profile)
   return calcCost(usage, prices, profile.fuelType)
 }

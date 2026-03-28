@@ -20,17 +20,17 @@ const COUNTRY_PRICES: Record<string, CountryPrices> = {
   US: { petrol: 0.95, diesel: 1.05, electricity: 0.16, currency: 'USD' },
   GB: { petrol: 1.45, diesel: 1.52, electricity: 0.28, currency: 'GBP' },
   CA: { petrol: 1.65, diesel: 1.72, electricity: 0.14, currency: 'CAD' },
-  NZ: { petrol: 2.80, diesel: 2.20, electricity: 0.28, currency: 'NZD' },
+  NZ: { petrol: 2.8, diesel: 2.2, electricity: 0.28, currency: 'NZD' },
   DE: { petrol: 1.75, diesel: 1.65, electricity: 0.35, currency: 'EUR' },
   FR: { petrol: 1.85, diesel: 1.75, electricity: 0.22, currency: 'EUR' },
-  IT: { petrol: 1.80, diesel: 1.70, electricity: 0.25, currency: 'EUR' },
-  ES: { petrol: 1.60, diesel: 1.50, electricity: 0.20, currency: 'EUR' },
+  IT: { petrol: 1.8, diesel: 1.7, electricity: 0.25, currency: 'EUR' },
+  ES: { petrol: 1.6, diesel: 1.5, electricity: 0.2, currency: 'EUR' },
   IN: { petrol: 103.0, diesel: 90.0, electricity: 8.0, currency: 'INR' },
   JP: { petrol: 175.0, diesel: 155.0, electricity: 31.0, currency: 'JPY' },
 }
 
 const DEFAULT_PRICES: CountryPrices = {
-  petrol: 1.50,
+  petrol: 1.5,
   diesel: 1.55,
   electricity: 0.25,
   currency: 'USD',

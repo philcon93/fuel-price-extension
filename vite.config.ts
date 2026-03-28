@@ -5,11 +5,7 @@ import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
 import manifest from './manifest.json'
 
 export default defineConfig({
-  plugins: [
-    vanillaExtractPlugin(),
-    solidPlugin(),
-    crx({ manifest }),
-  ],
+  plugins: [vanillaExtractPlugin(), solidPlugin(), crx({ manifest })],
   build: {
     target: 'esnext',
   },

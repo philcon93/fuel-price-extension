@@ -50,11 +50,7 @@
       "run_at": "document_idle"
     }
   ],
-  "permissions": [
-    "storage",
-    "activeTab",
-    "alarms"
-  ],
+  "permissions": ["storage", "activeTab", "alarms"],
   "host_permissions": [
     "https://*.google.com/maps/*",
     "https://*.google.com.au/maps/*",

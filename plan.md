@@ -23,6 +23,7 @@ This fills a real gap: existing extensions in this space are unreliable, geo-loc
 ## Market Research
 
 Existing extensions have a ceiling of ~4,000 users and persistent complaints:
+
 - Unreliable — fails to show up, NaN bugs
 - Manual fuel price input only
 - Geo-locked (US/Canada or Europe only)
@@ -31,6 +32,7 @@ Existing extensions have a ceiling of ~4,000 users and persistent complaints:
 - No comparison to average
 
 **Key differentiators of this extension:**
+
 - Car lookup by name (type "Corolla 2023 hybrid", it figures out the rest)
 - Truly global — currency auto-detected, fuel prices auto-fetched per region
 - Multiple saved car profiles with side-by-side comparison
@@ -42,18 +44,18 @@ Existing extensions have a ceiling of ~4,000 users and persistent complaints:
 
 ## Tech Stack
 
-| Layer | Technology | Reason |
-|---|---|---|
-| Build tool | Vite | Fast, modern, excellent DX |
-| UI framework | SolidJS | Tiny bundle, fine-grained reactivity, perfect for popup |
-| Styling | Vanilla Extract | Zero-runtime, type-safe CSS-in-TS, build-time extraction |
-| Language | TypeScript | Type safety across API shapes and shared models |
-| Extension standard | Chrome Manifest V3 | Required for Chrome Web Store |
-| Vite plugin | @crxjs/vite-plugin | Handles HMR and manifest wiring for extensions |
-| Content script | Vanilla TS + Shadow DOM | Isolated from Google Maps CSS, no framework needed |
-| Background worker | Vanilla TS | Service worker context, no framework needed |
-| Storage | chrome.storage.sync | Roams with user's Google account |
-| Cache | chrome.storage.local | Fuel price cache with timestamp |
+| Layer              | Technology              | Reason                                                   |
+| ------------------ | ----------------------- | -------------------------------------------------------- |
+| Build tool         | Vite                    | Fast, modern, excellent DX                               |
+| UI framework       | SolidJS                 | Tiny bundle, fine-grained reactivity, perfect for popup  |
+| Styling            | Vanilla Extract         | Zero-runtime, type-safe CSS-in-TS, build-time extraction |
+| Language           | TypeScript              | Type safety across API shapes and shared models          |
+| Extension standard | Chrome Manifest V3      | Required for Chrome Web Store                            |
+| Vite plugin        | @crxjs/vite-plugin      | Handles HMR and manifest wiring for extensions           |
+| Content script     | Vanilla TS + Shadow DOM | Isolated from Google Maps CSS, no framework needed       |
+| Background worker  | Vanilla TS              | Service worker context, no framework needed              |
+| Storage            | chrome.storage.sync     | Roams with user's Google account                         |
+| Cache              | chrome.storage.local    | Fuel price cache with timestamp                          |
 
 No backend required. All APIs used are free, public, and CORS-friendly.
 
@@ -136,11 +138,7 @@ import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
 import manifest from './manifest.json'
 
 export default defineConfig({
-  plugins: [
-    vanillaExtractPlugin(),
-    solidPlugin(),
-    crx({ manifest }),
-  ],
+  plugins: [vanillaExtractPlugin(), solidPlugin(), crx({ manifest })],
 })
 ```
 
@@ -154,6 +152,7 @@ npm run build   # production build for Chrome Web Store submission
 ```
 
 Loading in Chrome:
+
 1. Go to chrome://extensions
 2. Enable Developer Mode
 3. Load Unpacked → select the dist/ folder
@@ -164,6 +163,7 @@ Loading in Chrome:
 ## Styling Approach
 
 ### Popup — Vanilla Extract
+
 All popup styles use Vanilla Extract (`.css.ts` files). VE extracts styles at build time into real CSS — zero runtime overhead, full TypeScript type safety on class names and tokens.
 
 Design tokens are defined once in `theme.css.ts` using `createTheme` and shared across all components:
@@ -179,7 +179,7 @@ export const [themeClass, vars] = createTheme({
     border: '#e0e0e0',
     text: '#1a1a1a',
     textMuted: '#6b6b6b',
-    accent: '#1a73e8',       // Google blue — blends with Maps UI
+    accent: '#1a73e8', // Google blue — blends with Maps UI
     accentHover: '#1557b0',
     danger: '#d93025',
     success: '#188038',
@@ -225,6 +225,7 @@ export const header = style({
 ```
 
 ### Content Script — Shadow DOM with plain CSS
+
 Vanilla Extract is a build-time tool — it cannot run inside a content script that executes in the browser page context. Instead, the injected fuel cost element uses a **Shadow DOM** with a plain CSS file (`injected.css`) that Vite bundles and the content script injects at runtime.
 
 ```ts
@@ -234,7 +235,7 @@ const shadow = host.attachShadow({ mode: 'closed' })
 
 // Inject styles into shadow root — fully isolated from Google Maps CSS
 const style = document.createElement('style')
-style.textContent = INJECTED_CSS   // inlined by Vite at build time
+style.textContent = INJECTED_CSS // inlined by Vite at build time
 shadow.appendChild(style)
 
 // Inject fuel cost UI into shadow root
@@ -257,10 +258,10 @@ export type EfficiencyUnit = 'l100km' | 'mpg' | 'kwh100km'
 export type Currency = 'AUD' | 'USD' | 'GBP' | 'EUR' | 'NZD' // extensible
 
 export interface CarProfile {
-  id: string                    // uuid
-  nickname: string              // "My Corolla", "Sarah's Ranger", "Average Car"
-  isDefault: boolean            // true only for Average Car
-  isLocked: boolean             // true only for Average Car — cannot edit or delete
+  id: string // uuid
+  nickname: string // "My Corolla", "Sarah's Ranger", "Average Car"
+  isDefault: boolean // true only for Average Car
+  isLocked: boolean // true only for Average Car — cannot edit or delete
 
   // From lookup or manual entry
   make?: string
@@ -271,21 +272,21 @@ export interface CarProfile {
   engineSizeL?: number
 
   // Efficiency
-  officialL100km?: number       // from manufacturer data
-  realWorldL100km?: number      // from lookup or user override
+  officialL100km?: number // from manufacturer data
+  realWorldL100km?: number // from lookup or user override
   useRealWorld: boolean
 
   // EV specific
   kWh100km?: number
 
-  isManual: boolean             // true if user typed values manually
+  isManual: boolean // true if user typed values manually
 }
 
 export interface UserSettings {
   distanceUnit: DistanceUnit
   efficiencyUnit: EfficiencyUnit
   currency: Currency
-  showAverageComparison: boolean  // only respected when activeCarId !== AVERAGE_CAR_ID
+  showAverageComparison: boolean // only respected when activeCarId !== AVERAGE_CAR_ID
 }
 
 export interface FuelPrices {
@@ -293,12 +294,12 @@ export interface FuelPrices {
   dieselPerLitre: number
   electricityPerKwh: number
   currency: Currency
-  lastUpdated: number           // unix timestamp ms
+  lastUpdated: number // unix timestamp ms
   source: string
 }
 
 export interface AppState {
-  cars: CarProfile[]            // index 0 is always Average Car
+  cars: CarProfile[] // index 0 is always Average Car
   activeCarId: string
   settings: UserSettings
   fuelPrices: FuelPrices
@@ -312,6 +313,7 @@ export type PopupView = 'home' | 'addCar' | 'editCar' | 'settings'
 ## External APIs
 
 ### Car Lookup — CarQuery API
+
 - **URL:** http://www.carqueryapi.com/api/0.3/
 - **Coverage:** Global, 1941–present, includes Australian-market vehicles
 - **Cost:** Free
@@ -322,6 +324,7 @@ export type PopupView = 'home' | 'addCar' | 'editCar' | 'settings'
 - **Returns:** make, model, year, trim, engine displacement, fuel type, body style, official fuel economy
 
 ### Fuel Prices — GlobePetrolPrices API
+
 - **URL:** https://www.globalpetrolprices.com/api/
 - **Coverage:** Global, 150+ countries
 - **Cost:** Free tier available
@@ -330,6 +333,7 @@ export type PopupView = 'home' | 'addCar' | 'editCar' | 'settings'
 - **Fallback:** If API unavailable, use hardcoded recent averages per country as a last resort
 
 ### Currency Detection
+
 - Use `Intl.NumberFormat().resolvedOptions().locale` from the browser
 - Map locale to currency (en-AU → AUD, en-US → USD, en-GB → GBP, etc.)
 - User can override in Settings
@@ -346,7 +350,7 @@ litres = (distanceKm / 100) * l100km
 
 // EV
 kWh = (distanceKm / 100) * kWh100km
-kWhWithChargingLoss = kWh / 0.88   // ~88% charging efficiency
+kWhWithChargingLoss = kWh / 0.88 // ~88% charging efficiency
 
 // Hybrid (PHEV)
 // Use electric range first, then petrol for remainder
@@ -384,6 +388,7 @@ const distanceKm = unit === 'miles' ? value * 1.60934 : value
 ### Average Car baseline
 
 Per-country fleet average L/100km values hardcoded as defaults:
+
 - Australia: 11.1 L/100km (petrol fleet average)
 - USA: 10.7 L/100km
 - UK: 8.9 L/100km
@@ -399,6 +404,7 @@ Detected from browser locale, used for the locked Average Car profile.
 This is the most fragile piece — Google Maps is a heavily dynamic React app.
 
 Strategy:
+
 1. On load, set up a `MutationObserver` on `document.body`
 2. Watch for DOM nodes that contain distance text matching the pattern
 3. When found, parse distance, fetch car profile and fuel prices from storage
@@ -417,17 +423,13 @@ Key challenge: Google may change their DOM structure. The selector targeting the
 ```ts
 // Resilient approach: find text nodes matching distance pattern
 // rather than relying on CSS class selectors
-const walker = document.createTreeWalker(
-  document.body,
-  NodeFilter.SHOW_TEXT,
-  {
-    acceptNode: (node) => {
-      return /^\d+(\.\d+)?\s*(km|mi)$/.test(node.textContent?.trim() ?? '')
-        ? NodeFilter.FILTER_ACCEPT
-        : NodeFilter.FILTER_REJECT
-    }
-  }
-)
+const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+  acceptNode: (node) => {
+    return /^\d+(\.\d+)?\s*(km|mi)$/.test(node.textContent?.trim() ?? '')
+      ? NodeFilter.FILTER_ACCEPT
+      : NodeFilter.FILTER_REJECT
+  },
+})
 ```
 
 ---
@@ -435,6 +437,7 @@ const walker = document.createTreeWalker(
 ## Popup UI Views
 
 ### Home view
+
 - Header: "⛽ Fuel Cost" title + gear icon (→ Settings)
 - Active car dropdown (select from saved profiles)
 - If active car is not Average Car: show efficiency and fuel type summary
@@ -442,6 +445,7 @@ const walker = document.createTreeWalker(
 - Current fuel prices shown (petrol/diesel/electricity) with last updated time
 
 ### AddCar / EditCar view
+
 - Header: back arrow + "Add a car" or "Edit car"
 - Search input: "Search your car e.g. Corolla 2023 hybrid"
 - Results list: shows matching trims for disambiguation
@@ -454,6 +458,7 @@ const walker = document.createTreeWalker(
 - Delete button (EditCar only, not shown for Average Car)
 
 ### Settings view
+
 - Header: back arrow + "Settings"
 - **Units section:**
   - Distance: km / miles
@@ -474,9 +479,7 @@ const walker = document.createTreeWalker(
 
 ```ts
 // In content script injection
-const showComparison =
-  settings.showAverageComparison &&
-  activeCarId !== AVERAGE_CAR_ID
+const showComparison = settings.showAverageComparison && activeCarId !== AVERAGE_CAR_ID
 
 // Injected display
 if (showComparison) {
@@ -497,6 +500,7 @@ Toggle is always visible in Settings but disabled (greyed + tooltip) when Averag
 Free tier: maximum 2 saved car profiles (Average Car does not count toward the limit).
 
 When user tries to add a 3rd car on free tier:
+
 - Show upsell prompt: "Upgrade to Pro for unlimited car profiles"
 - Do not proceed to AddCar view
 
@@ -506,16 +510,16 @@ This is the only paid gating in v1. All other features are free.
 
 ## Paid Features (Future)
 
-| Feature | Tier | Notes |
-|---|---|---|
-| Unlimited car profiles | Pro ~$2-3/mo or $15/yr | Core upsell |
-| Trip history & monthly spend reporting | Pro | Requires local storage of journeys |
-| CSV export of trips | Pro | |
-| Multi-stop journey cost breakdown | Pro | Per-leg breakdown |
-| Fuel price alerts | Pro | Requires lightweight backend |
-| Trailer/load modifier (+% fuel use) | Pro | Popular in AU for towing caravans |
-| Shared profiles + per-driver reporting | Fleet ~$10-15/mo | B2B upsell |
-| Lifetime purchase | One-time ~$25-30 | Offer at launch |
+| Feature                                | Tier                   | Notes                              |
+| -------------------------------------- | ---------------------- | ---------------------------------- |
+| Unlimited car profiles                 | Pro ~$2-3/mo or $15/yr | Core upsell                        |
+| Trip history & monthly spend reporting | Pro                    | Requires local storage of journeys |
+| CSV export of trips                    | Pro                    |                                    |
+| Multi-stop journey cost breakdown      | Pro                    | Per-leg breakdown                  |
+| Fuel price alerts                      | Pro                    | Requires lightweight backend       |
+| Trailer/load modifier (+% fuel use)    | Pro                    | Popular in AU for towing caravans  |
+| Shared profiles + per-driver reporting | Fleet ~$10-15/mo       | B2B upsell                         |
+| Lifetime purchase                      | One-time ~$25-30       | Offer at launch                    |
 
 ---
 
@@ -528,6 +532,7 @@ This license allows anyone to use, modify, and share the software freely — but
 The full license text must be in a `LICENSE` file in the root of the repository. The coding agent should create this file with the official PolyForm Noncommercial 1.0.0 text, available at https://polyformproject.org/licenses/noncommercial/1.0.0/
 
 Key points of the license:
+
 - ✅ Free to use personally
 - ✅ Free to modify and share
 - ✅ Free to use for noncommercial open source projects
@@ -544,16 +549,20 @@ The licensor (you) retains the right to offer paid Pro/Fleet tiers of your own p
 Build in this order — each step is independently testable before the next.
 
 ### Step 1 — LICENSE
+
 Create the LICENSE file in the repo root with the full PolyForm Noncommercial 1.0.0 text from https://polyformproject.org/licenses/noncommercial/1.0.0/ — fill in the licensor name and year.
 
 ### Step 2 — manifest.json
+
 Define permissions, content script URL match patterns, popup entry point, background service worker. Nothing works without this.
 
 Required permissions:
+
 - `storage`
 - `activeTab`
 
 Required host_permissions:
+
 - `https://www.google.com/maps/*`
 - `https://maps.google.com/*`
 - `https://maps.google.com.au/*` (and other regional domains)
@@ -561,15 +570,19 @@ Required host_permissions:
 - Fuel price API domain
 
 ### Step 3 — vite.config.ts + tsconfig.json + package.json
+
 Get the build pipeline running with Vite + CRXJS + SolidJS + Vanilla Extract. Confirm `npm run dev` produces a dist/ folder that loads in Chrome as an unpacked extension. Confirm a `.css.ts` file compiles correctly.
 
 ### Step 4 — theme.css.ts + global.css.ts
+
 Define all design tokens before writing any component styles. Every colour, spacing value, font size, and border radius defined once here. Global CSS resets applied. This is the styling foundation everything else builds on.
 
 ### Step 5 — types.ts
+
 Define all shared TypeScript interfaces before writing any logic. CarProfile, UserSettings, FuelPrices, AppState, PopupView.
 
 ### Step 6 — popup shell (popup/index.html + App.tsx)
+
 SolidJS entry point with view state signal. Apply themeClass to root element. Render placeholder content for each view. Confirm popup opens in Chrome with correct base styles.
 
 ```ts
@@ -577,38 +590,49 @@ const [view, setView] = createSignal<PopupView>('home')
 ```
 
 ### Step 7 — utils/carLookup.ts
+
 CarQuery API integration. Functions:
+
 - `searchCars(query: string): Promise<CarResult[]>` — parse natural language input, fetch trims
 - `parseQuery(input: string): { make?, model?, year?, keywords[] }` — extract structured fields from free text
 
 Test this in isolation by calling it from the browser console before wiring to UI.
 
 ### Step 8 — CarSearch.tsx + TrimPicker.tsx + ManualEntry.tsx
+
 Build the AddCar UI components with Vanilla Extract styles. Wire to carLookup.ts. Confirm search, disambiguation, and manual fallback all work.
 
 ### Step 9 — utils/storage.ts
+
 Helpers for reading and writing AppState to chrome.storage.sync. Initialize with default state on first install (Average Car profile, locale-detected settings).
 
 ### Step 10 — Home.tsx
+
 Car selector dropdown reading from storage. Switch active car. Link to AddCar. Show current fuel prices.
 
 ### Step 11 — utils/fuelPrices.ts
+
 Fetch fuel prices from GlobePetrolPrices API. Cache in chrome.storage.local with timestamp. Refresh if stale (>24h). Return cached prices if fetch fails.
 
 ### Step 12 — background/index.ts
+
 Service worker. On install: fetch fuel prices. On daily alarm: refresh fuel prices. Respond to messages from content script requesting current prices.
 
 ### Step 13 — utils/calculator.ts
+
 Pure functions only — no DOM, no API calls, easy to unit test:
+
 - `calcFuelUsed(distanceKm, profile): number`
 - `calcCost(fuelUsed, prices, fuelType): number`
 - `convertDistance(value, from, to): number`
 - `formatCost(amount, currency): string`
 
 ### Step 14 — Settings.tsx
+
 Wire all settings controls to storage. Implement toggle disable logic for showAverageComparison when Average Car is active.
 
 ### Step 15 — content/index.ts + injected.css
+
 MutationObserver watching for Google Maps distance text. Parse distance. Fetch profile + prices from storage. Run calculator. Create Shadow DOM host, inject isolated styles from injected.css, render fuel cost element. Handle route changes. Support all regional Google Maps domains.
 
 This is the most brittle step. Build last when everything else is confirmed working.
@@ -628,6 +652,7 @@ Google Maps uses different domains by region. The content script must match all 
 - (and many more)
 
 In manifest.json, use a broad match pattern:
+
 ```json
 "matches": ["https://*.google.*/maps/*", "https://maps.google.*/*"]
 ```

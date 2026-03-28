@@ -40,7 +40,9 @@ const TrimPicker: Component<TrimPickerProps> = (props) => {
       <button class={s.backLink} onClick={props.onBack}>
         &larr; Back to search
       </button>
-      <div class={s.heading}>{props.make} {props.model} {props.year}</div>
+      <div class={s.heading}>
+        {props.make} {props.model} {props.year}
+      </div>
       <div class={s.subheading}>Select your trim variant:</div>
 
       <Show when={loading()}>

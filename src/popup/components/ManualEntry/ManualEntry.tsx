@@ -14,11 +14,9 @@ const ManualEntry: Component<ManualEntryProps> = (props) => {
   const [fuelType, setFuelType] = createSignal<FuelType>(car?.fuelType ?? 'petrol')
   const [engineSize, setEngineSize] = createSignal(car?.engineSizeL?.toString() ?? '')
   const [efficiency, setEfficiency] = createSignal(
-    (car?.realWorldL100km ?? car?.officialL100km ?? '').toString()
+    (car?.realWorldL100km ?? car?.officialL100km ?? '').toString(),
   )
-  const [kwhEfficiency, setKwhEfficiency] = createSignal(
-    (car?.kWh100km ?? '').toString()
-  )
+  const [kwhEfficiency, setKwhEfficiency] = createSignal((car?.kWh100km ?? '').toString())
 
   const isValid = () => {
     if (!nickname().trim()) return false
@@ -40,9 +38,10 @@ const ManualEntry: Component<ManualEntryProps> = (props) => {
       realWorldL100km: fuelType() !== 'electric' ? parseFloat(efficiency()) : undefined,
       officialL100km: undefined,
       useRealWorld: true,
-      kWh100km: fuelType() === 'electric' || fuelType() === 'phev'
-        ? parseFloat(kwhEfficiency())
-        : undefined,
+      kWh100km:
+        fuelType() === 'electric' || fuelType() === 'phev'
+          ? parseFloat(kwhEfficiency())
+          : undefined,
       isManual: true,
     }
 
@@ -131,11 +130,7 @@ const ManualEntry: Component<ManualEntryProps> = (props) => {
         </div>
       )}
 
-      <button
-        class={s.saveButton}
-        onClick={handleSave}
-        disabled={!isValid()}
-      >
+      <button class={s.saveButton} onClick={handleSave} disabled={!isValid()}>
         {props.existingCar ? 'Save changes' : 'Save car'}
       </button>
     </div>
