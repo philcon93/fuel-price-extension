@@ -62,6 +62,7 @@
     "https://maps.google.co.uk/*",
     "https://maps.google.ca/*",
     "https://maps.google.co.nz/*",
+    "https://www.carqueryapi.com/*",
     "http://www.carqueryapi.com/*"
   ]
 }

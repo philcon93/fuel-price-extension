@@ -28,7 +28,6 @@ export function parseQuery(input: string): ParsedQuery {
       result.year = parseInt(token)
       continue
     }
-    // Skip fuel-type keywords — used for filtering later, not for the API query
     if (['hybrid', 'diesel', 'petrol', 'electric', 'phev', 'ev'].includes(token)) {
       result.keywords.push(token)
       continue
@@ -45,37 +44,24 @@ export function parseQuery(input: string): ParsedQuery {
   return result
 }
 
-async function fetchJsonp(url: string): Promise<unknown> {
-  const callbackName = `carquery_cb_${Date.now()}`
-  const fullUrl = `${url}&callback=${callbackName}`
-
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script')
-    const w = window as unknown as Record<string, unknown>
-    w[callbackName] = (data: unknown) => {
-      resolve(data)
-      script.remove()
-      delete w[callbackName]
-    }
-    script.onerror = () => {
-      reject(new Error('JSONP request failed'))
-      script.remove()
-      delete w[callbackName]
-    }
-    script.src = fullUrl
-    document.head.appendChild(script)
+async function fetchCarQuery(params: string): Promise<unknown> {
+  const response = await chrome.runtime.sendMessage({
+    type: 'CAR_QUERY_FETCH',
+    url: `${API_BASE}?${params}`,
   })
+  if (!response) throw new Error('Car query fetch failed')
+  return response
 }
 
 export async function searchCars(query: string): Promise<CarResult[]> {
   const parsed = parseQuery(query)
   if (!parsed.make) return []
 
-  let url = `${API_BASE}?cmd=getModels&make=${encodeURIComponent(parsed.make)}`
-  if (parsed.year) url += `&year=${parsed.year}`
-  if (parsed.model) url += `&model=${encodeURIComponent(parsed.model)}`
+  let params = `cmd=getModels&make=${encodeURIComponent(parsed.make)}`
+  if (parsed.year) params += `&year=${parsed.year}`
+  if (parsed.model) params += `&model=${encodeURIComponent(parsed.model)}`
 
-  const data = (await fetchJsonp(url)) as {
+  const data = (await fetchCarQuery(params)) as {
     Models?: Array<{
       model_name: string
       model_make_display: string
@@ -118,8 +104,8 @@ export async function searchCars(query: string): Promise<CarResult[]> {
 }
 
 export async function getTrims(make: string, model: string, year: number): Promise<CarQueryTrim[]> {
-  const url = `${API_BASE}?cmd=getTrims&make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&year=${year}`
-  const data = (await fetchJsonp(url)) as { Trims?: Array<Record<string, string>> }
+  const params = `cmd=getTrims&make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&year=${year}`
+  const data = (await fetchCarQuery(params)) as { Trims?: Array<Record<string, string>> }
 
   if (!data.Trims) return []
 
