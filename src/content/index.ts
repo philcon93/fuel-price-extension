@@ -123,7 +123,27 @@ async function processDistanceElement(el: Element, distanceText: string) {
     el.appendChild(costEl)
   } catch {
     // Parent may have been removed between check and insertion
+    return
   }
+
+  chrome.runtime.sendMessage({
+    type: 'RECORD_TRIP',
+    trip: {
+      timestamp: Date.now(),
+      distanceKm,
+      fuelCost: cost,
+      carId: activeCar.id,
+      carNickname: activeCar.nickname,
+      fuelType: activeCar.fuelType,
+      currency: state.settings.currency,
+    },
+  })
+
+  chrome.runtime.sendMessage({
+    type: 'TRACK_FUEL_CALC',
+    distanceKm,
+    fuelType: activeCar.fuelType,
+  })
 }
 
 function scanForDistances() {

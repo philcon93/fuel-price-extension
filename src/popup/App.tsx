@@ -6,6 +6,7 @@ import { Header } from '@components/Header'
 import { Home } from '@components/Home'
 import { CarSearch } from '@components/CarSearch'
 import { Settings } from '@components/Settings'
+import { TripHistory } from '@components/TripHistory'
 
 export const App: Component = () => {
   const [view, setView] = createSignal<PopupView>({ kind: 'home' })
@@ -21,6 +22,8 @@ export const App: Component = () => {
         return 'Edit car'
       case 'settings':
         return 'Settings'
+      case 'history':
+        return 'Trip History'
     }
   }
 
@@ -41,6 +44,7 @@ export const App: Component = () => {
             onAddCar={() => setView({ kind: 'addCar' })}
             onEditCar={(id) => setView({ kind: 'editCar', carId: id })}
             onSettings={() => setView({ kind: 'settings' })}
+            onHistory={() => setView({ kind: 'history' })}
           />
         </Match>
         <Match when={view().kind === 'addCar' || view().kind === 'editCar'}>
@@ -55,6 +59,9 @@ export const App: Component = () => {
         </Match>
         <Match when={view().kind === 'settings'}>
           <Settings onBack={() => setView({ kind: 'home' })} />
+        </Match>
+        <Match when={view().kind === 'history'}>
+          <TripHistory />
         </Match>
       </Switch>
     </div>

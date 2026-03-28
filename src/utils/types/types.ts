@@ -58,6 +58,18 @@ export type PopupView =
   | { kind: 'addCar' }
   | { kind: 'editCar'; carId: string }
   | { kind: 'settings' }
+  | { kind: 'history' }
+
+export interface TripRecord {
+  id?: number
+  timestamp: number
+  distanceKm: number
+  fuelCost: number
+  carId: string
+  carNickname: string
+  fuelType: FuelType
+  currency: Currency
+}
 
 export interface CarQueryTrim {
   modelId: string

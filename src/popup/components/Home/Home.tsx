@@ -8,6 +8,7 @@ interface HomeProps {
   onAddCar: () => void
   onEditCar: (id: string) => void
   onSettings: () => void
+  onHistory: () => void
 }
 
 export const Home: Component<HomeProps> = (props) => {
@@ -95,17 +96,37 @@ export const Home: Component<HomeProps> = (props) => {
             </Show>
           </div>
 
-          <button class={s.addCarLink} onClick={handleAddCar}>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path
-                d="M7 1V13M1 7H13"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-              />
-            </svg>
-            Add a car
-          </button>
+          <div style={{ display: 'flex', gap: '16px', 'align-items': 'center' }}>
+            <button class={s.addCarLink} onClick={handleAddCar}>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path
+                  d="M7 1V13M1 7H13"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+              </svg>
+              Add a car
+            </button>
+            <button class={s.addCarLink} onClick={() => props.onHistory()}>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path
+                  d="M7 1v12M1 7a6 6 0 1112 0A6 6 0 011 7z"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  fill="none"
+                />
+                <path
+                  d="M7 4v3l2 2"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              Trip history
+            </button>
+          </div>
 
           <div class={s.section}>
             <span class={s.sectionLabel}>Fuel prices</span>

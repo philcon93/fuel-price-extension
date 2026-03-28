@@ -11,4 +11,5 @@ export {
   type AppState,
   type PopupView,
   type CarQueryTrim,
+  type TripRecord,
 } from './types'
