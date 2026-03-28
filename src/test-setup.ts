@@ -1,4 +1,11 @@
-import { vi } from 'vitest'
+import 'fake-indexeddb/auto'
+import { vi, afterEach } from 'vitest'
+import { cleanup } from '@solidjs/testing-library'
+import '@testing-library/jest-dom/vitest'
+
+afterEach(() => {
+  cleanup()
+})
 
 const syncStore: Record<string, unknown> = {}
 const localStore: Record<string, unknown> = {}
@@ -12,9 +19,22 @@ const messageListeners: Array<
 const chromeMock = {
   storage: {
     sync: {
-      get: vi.fn(async (key: string) => ({ [key]: syncStore[key] ?? undefined })),
+      get: vi.fn(async (keys: string | string[]) => {
+        if (Array.isArray(keys)) {
+          const result: Record<string, unknown> = {}
+          for (const key of keys) {
+            if (syncStore[key] !== undefined) result[key] = syncStore[key]
+          }
+          return result
+        }
+        return { [keys]: syncStore[keys] ?? undefined }
+      }),
       set: vi.fn(async (items: Record<string, unknown>) => {
         Object.assign(syncStore, items)
+      }),
+      remove: vi.fn(async (keys: string | string[]) => {
+        const keyList = Array.isArray(keys) ? keys : [keys]
+        for (const key of keyList) delete syncStore[key]
       }),
     },
     local: {

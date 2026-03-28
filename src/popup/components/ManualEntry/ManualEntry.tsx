@@ -2,6 +2,7 @@ import { createSignal, type Component } from 'solid-js'
 import * as s from './ManualEntry.css'
 import { addCar, updateCar } from '@utils/storage'
 import type { CarProfile, FuelType } from '@utils/types'
+import { AnalyticsEvents } from '@utils/analytics'
 
 interface ManualEntryProps {
   existingCar?: CarProfile
@@ -50,6 +51,7 @@ export const ManualEntry: Component<ManualEntryProps> = (props) => {
       await updateCar(existingCar.id, profile)
     } else {
       await addCar(profile)
+      AnalyticsEvents.carAdded('manual', profile.fuelType)
     }
     props.onSave()
   }
@@ -57,8 +59,11 @@ export const ManualEntry: Component<ManualEntryProps> = (props) => {
   return (
     <div class={s.form}>
       <div class={s.field}>
-        <label class={s.fieldLabel}>Nickname</label>
+        <label class={s.fieldLabel} for="manual-nickname">
+          Nickname
+        </label>
         <input
+          id="manual-nickname"
           class={s.input}
           type="text"
           placeholder='e.g. "My Corolla"'
@@ -68,8 +73,11 @@ export const ManualEntry: Component<ManualEntryProps> = (props) => {
       </div>
 
       <div class={s.field}>
-        <label class={s.fieldLabel}>Fuel type</label>
+        <label class={s.fieldLabel} for="manual-fuel-type">
+          Fuel type
+        </label>
         <select
+          id="manual-fuel-type"
           class={s.select}
           value={fuelType()}
           onChange={(e) => setFuelType(e.currentTarget.value as FuelType)}
@@ -83,8 +91,11 @@ export const ManualEntry: Component<ManualEntryProps> = (props) => {
       </div>
 
       <div class={s.field}>
-        <label class={s.fieldLabel}>Engine size</label>
+        <label class={s.fieldLabel} for="manual-engine-size">
+          Engine size
+        </label>
         <select
+          id="manual-engine-size"
           class={s.select}
           value={engineSize()}
           onChange={(e) => setEngineSize(e.currentTarget.value)}
@@ -103,8 +114,11 @@ export const ManualEntry: Component<ManualEntryProps> = (props) => {
 
       {fuelType() !== 'electric' && (
         <div class={s.field}>
-          <label class={s.fieldLabel}>Fuel efficiency (L/100km)</label>
+          <label class={s.fieldLabel} for="manual-efficiency">
+            Fuel efficiency (L/100km)
+          </label>
           <input
+            id="manual-efficiency"
             class={s.input}
             type="number"
             step="0.1"
@@ -118,8 +132,11 @@ export const ManualEntry: Component<ManualEntryProps> = (props) => {
 
       {(fuelType() === 'electric' || fuelType() === 'phev') && (
         <div class={s.field}>
-          <label class={s.fieldLabel}>Electricity consumption (kWh/100km)</label>
+          <label class={s.fieldLabel} for="manual-kwh-efficiency">
+            Electricity consumption (kWh/100km)
+          </label>
           <input
+            id="manual-kwh-efficiency"
             class={s.input}
             type="number"
             step="0.1"
