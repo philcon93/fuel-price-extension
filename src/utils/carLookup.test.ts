@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { parseQuery } from '../carLookup'
+import { parseQuery } from './carLookup'
 
 describe('parseQuery', () => {
   it('parses make only', () => {

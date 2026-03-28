@@ -6,8 +6,8 @@ import {
   calcTripCost,
   formatCost,
   parseDistanceText,
-} from '../calculator'
-import type { CarProfile, FuelPrices } from '../types'
+} from './calculator'
+import type { CarProfile, FuelPrices } from './types'
 
 const petrolCar: CarProfile = {
   id: 'test-petrol',
