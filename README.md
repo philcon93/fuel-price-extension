@@ -2,6 +2,8 @@
 
 A Chrome extension that shows how much your journey will cost in fuel, right inside Google Maps. No tab switching, no manual calculations. Pick your car, see the cost.
 
+![Fuel cost injected into Google Maps directions](public/showcase.png)
+
 ## What it does
 
 When you plan a route on Google Maps, this extension reads the distance and calculates the fuel cost based on your car's efficiency and current fuel prices. The cost appears inline, next to the distance Google Maps already shows.
