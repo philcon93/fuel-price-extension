@@ -17,7 +17,9 @@ interface ParsedQuery {
 }
 
 export function parseQuery(input: string): ParsedQuery {
-  const tokens = input.trim().toLowerCase().split(/\s+/)
+  const trimmed = input.trim().toLowerCase()
+  if (!trimmed) return { keywords: [] }
+  const tokens = trimmed.split(/\s+/)
   const result: ParsedQuery = { keywords: [] }
 
   for (const token of tokens) {
