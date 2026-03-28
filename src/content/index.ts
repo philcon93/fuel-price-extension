@@ -3,14 +3,25 @@ import { AVERAGE_CAR_ID, type AppState } from '@utils/types'
 import injectedCss from './injected.css?inline'
 
 const FUEL_COST_HOST_ATTR = 'data-fuel-cost-host'
+const STORAGE_KEY = 'fuelCostAppState'
 
 let observer: MutationObserver | null = null
 let processedNodes = new WeakSet<Node>()
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
+let cachedState: AppState | null = null
 
 async function getState(): Promise<AppState | null> {
   try {
-    return await chrome.runtime.sendMessage({ type: 'GET_APP_STATE' })
+    if (cachedState) return cachedState
+    const result = await chrome.storage.sync.get(STORAGE_KEY)
+    const state = (result[STORAGE_KEY] as AppState) ?? null
+    if (state) {
+      cachedState = state
+      setTimeout(() => {
+        cachedState = null
+      }, 10_000)
+    }
+    return state
   } catch {
     return null
   }
@@ -27,6 +38,9 @@ function createFuelCostElement(
 ): HTMLElement {
   const host = document.createElement('span')
   host.setAttribute(FUEL_COST_HOST_ATTR, 'true')
+  host.style.display = 'inline-flex'
+  host.style.alignItems = 'center'
+  host.style.marginLeft = '6px'
   const shadow = host.attachShadow({ mode: 'closed' })
 
   const style = document.createElement('style')
@@ -67,22 +81,19 @@ function createFuelCostElement(
   return host
 }
 
-async function processDistanceNode(textNode: Text) {
-  if (processedNodes.has(textNode)) return
+const DISTANCE_PATTERN = /(\d[\d,.]*)\s*(km|mi|miles?)\b/i
 
-  const text = textNode.textContent?.trim()
-  if (!text) return
+function extractDistance(text: string): { value: number; unit: 'km' | 'miles' } | null {
+  const cleaned = text.replace(/\u00A0/g, ' ').trim()
+  return parseDistanceText(cleaned)
+}
 
-  const parsed = parseDistanceText(text)
+async function processDistanceElement(el: Element, distanceText: string) {
+  if (el.querySelector(`[${FUEL_COST_HOST_ATTR}]`)) return
+  if (el.closest(`[${FUEL_COST_HOST_ATTR}]`)) return
+
+  const parsed = extractDistance(distanceText)
   if (!parsed) return
-
-  const parentEl = textNode.parentElement
-  if (!parentEl) return
-
-  if (parentEl.querySelector(`[${FUEL_COST_HOST_ATTR}]`)) return
-  if (parentEl.closest(`[${FUEL_COST_HOST_ATTR}]`)) return
-
-  processedNodes.add(textNode)
 
   const state = await getState()
   if (!state) return
@@ -106,10 +117,10 @@ async function processDistanceNode(textNode: Text) {
     }
   }
 
-  const el = createFuelCostElement(primaryCost, comparisonCost, comparisonLabel)
+  const costEl = createFuelCostElement(primaryCost, comparisonCost, comparisonLabel)
 
   try {
-    parentEl.appendChild(el)
+    el.appendChild(costEl)
   } catch {
     // Parent may have been removed between check and insertion
   }
@@ -119,11 +130,10 @@ function scanForDistances() {
   try {
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
       acceptNode: (node) => {
-        const text = node.textContent?.trim() ?? ''
         if (processedNodes.has(node)) return NodeFilter.FILTER_REJECT
-        if (/^\d[\d,.]*\s*(km|mi|miles?)$/i.test(text)) {
-          return NodeFilter.FILTER_ACCEPT
-        }
+        const text = (node.textContent ?? '').replace(/\u00A0/g, ' ').trim()
+        if (!text) return NodeFilter.FILTER_REJECT
+        if (DISTANCE_PATTERN.test(text)) return NodeFilter.FILTER_ACCEPT
         return NodeFilter.FILTER_REJECT
       },
     })
@@ -135,7 +145,11 @@ function scanForDistances() {
     }
 
     for (const node of nodes) {
-      processDistanceNode(node)
+      processedNodes.add(node)
+      const text = (node.textContent ?? '').replace(/\u00A0/g, ' ').trim()
+      const parentEl = node.parentElement
+      if (!parentEl) continue
+      processDistanceElement(parentEl, text)
     }
   } catch (e) {
     console.error('[Fuel Cost] Scan error:', e)
@@ -154,7 +168,6 @@ function startObserver() {
 
   processedNodes = new WeakSet()
   removeExistingHosts()
-
   scanForDistances()
 
   observer = new MutationObserver((mutations) => {
@@ -179,7 +192,6 @@ function startObserver() {
   })
 }
 
-// Re-scan when the URL changes (SPA navigation in Maps)
 let lastUrl = location.href
 const urlCheckInterval = setInterval(() => {
   if (location.href !== lastUrl) {
@@ -190,7 +202,6 @@ const urlCheckInterval = setInterval(() => {
   }
 }, 1000)
 
-// Cleanup on unload
 window.addEventListener('beforeunload', () => {
   if (observer) {
     observer.disconnect()
@@ -201,7 +212,6 @@ window.addEventListener('beforeunload', () => {
   removeExistingHosts()
 })
 
-// Start
 try {
   startObserver()
 } catch (e) {
