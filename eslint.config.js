@@ -4,16 +4,16 @@ import prettier from 'eslint-config-prettier'
 
 export default tseslint.config(
   {
-    ignores: ['dist/**', 'node_modules/**', '*.css.ts'],
+    ignores: ['**/dist/**', '**/node_modules/**', '**/*.css.ts'],
   },
   ...tseslint.configs.recommended,
   {
     ...solid,
-    files: ['src/**/*.{ts,tsx}'],
+    files: ['apps/extension/src/**/*.{ts,tsx}'],
   },
   prettier,
   {
-    files: ['src/**/*.{ts,tsx}'],
+    files: ['apps/**/src/**/*.{ts,tsx}'],
     rules: {
       '@typescript-eslint/no-unused-vars': [
         'warn',
