@@ -34,9 +34,7 @@ export const Cars: Component<CarsProps> = (props) => {
         : null
     }
     const l100km = car.useRealWorld ? car.realWorldL100km : car.officialL100km
-    return l100km
-      ? substitute(i18n['{{value}} L/100km'], { value: String(l100km) })
-      : null
+    return l100km ? substitute(i18n['{{value}} L/100km'], { value: String(l100km) }) : null
   }
 
   const fuelTypeLabel = (car: CarProfile): string => {
@@ -82,7 +80,7 @@ export const Cars: Component<CarsProps> = (props) => {
 
   return (
     <Show when={state()} fallback={<div class={s.container}>{i18n['Loading...']}</div>}>
-      {(appState) => (
+      {(_appState) => (
         <div class={s.container}>
           <div>
             <div class={s.pageTitle}>{i18n['Your Garage']}</div>

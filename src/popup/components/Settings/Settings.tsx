@@ -282,9 +282,7 @@ export const Settings: Component<SettingsProps> = () => {
                 </div>
                 <div class={s.rowText}>
                   <span class={s.label}>{i18n['Anonymous Analytics']}</span>
-                  <span class={s.sublabel}>
-                    {i18n['Help improve with non-identifiable data']}
-                  </span>
+                  <span class={s.sublabel}>{i18n['Help improve with non-identifiable data']}</span>
                 </div>
               </div>
               <button

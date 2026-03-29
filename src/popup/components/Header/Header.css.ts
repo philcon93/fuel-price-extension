@@ -6,7 +6,7 @@ export const header = style({
   alignItems: 'center',
   justifyContent: 'space-between',
   padding: `${vars.space.sm} ${vars.space.md}`,
-  borderBottom: `1px solid ${vars.color.border}`,
+  borderBottom: `1px solid ${vars.color.outlineVariant}`,
   minHeight: '44px',
 })
 
@@ -19,7 +19,7 @@ export const headerLeft = style({
 export const title = style({
   fontSize: vars.font.lg,
   fontWeight: 600,
-  color: vars.color.text,
+  color: vars.color.onSurface,
 })
 
 export const backButton = style({
@@ -29,10 +29,10 @@ export const backButton = style({
   width: '28px',
   height: '28px',
   borderRadius: vars.radius.sm,
-  color: vars.color.textMuted,
+  color: vars.color.onSurfaceVariant,
   ':hover': {
     backgroundColor: vars.color.surface,
-    color: vars.color.text,
+    color: vars.color.onSurface,
   },
 })
 
@@ -43,9 +43,9 @@ export const settingsButton = style({
   width: '28px',
   height: '28px',
   borderRadius: vars.radius.sm,
-  color: vars.color.textMuted,
+  color: vars.color.onSurfaceVariant,
   ':hover': {
     backgroundColor: vars.color.surface,
-    color: vars.color.text,
+    color: vars.color.onSurface,
   },
 })

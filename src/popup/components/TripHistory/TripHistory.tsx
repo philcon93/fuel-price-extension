@@ -45,7 +45,8 @@ export const TripHistory: Component = () => {
   }
 
   const formatDistance = (km: number): string => {
-    if (km < 1) return substitute(i18n['{{distance}}m'], { distance: String(Math.round(km * 1000)) })
+    if (km < 1)
+      return substitute(i18n['{{distance}}m'], { distance: String(Math.round(km * 1000)) })
     return substitute(i18n['{{distance}} km'], { distance: km.toFixed(1) })
   }
 
@@ -86,7 +87,11 @@ export const TripHistory: Component = () => {
           when={stats().totalTrips > 0}
           fallback={
             <div class={s.emptyState}>
-              {i18n['No trips recorded yet. Navigate on Google Maps to see your fuel cost history here.']}
+              {
+                i18n[
+                  'No trips recorded yet. Navigate on Google Maps to see your fuel cost history here.'
+                ]
+              }
             </div>
           }
         >
